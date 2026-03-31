@@ -306,26 +306,8 @@ def run_pipeline(product: str, country: str) -> list[dict]:
         
     if not TAVILY_API_KEY or not MEGALLM_API_KEY:
         print("[INFO] API Keys missing. Using Demo Mode fallback for Vendor Discovery.")
-        return [
-            {
-                "name": f"{country} Industrial Systems",
-                "website": f"https://www.{country.lower().replace(' ', '')}industrial.com",
-                "snippet": "Leading manufacturer of high-precision industrial equipment.",
-                "sells_product": True,
-                "vendor_type": "Manufacturer",
-                "red_flags": "None found",
-                "trust_score": 0.88
-            },
-            {
-                "name": "Global Trade Partners",
-                "website": "https://www.globaltrade.com",
-                "snippet": "Authorized distributor for international industrial brands.",
-                "sells_product": True,
-                "vendor_type": "Distributor",
-                "red_flags": "Limited service history",
-                "trust_score": 0.72
-            }
-        ]
+        from demo_data import get_mock_vendors
+        return get_mock_vendors(country)
 
     print(f"[INFO] [Phase 1] Discovering top vendors for '{core_product}' in {country}...")
     vendors = discover_vendors(core_product, country)

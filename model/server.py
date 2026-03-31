@@ -359,11 +359,8 @@ def find_vendors(req: VendorRequest):
         vendors = run_pipeline(req.product, req.country)
     except Exception:
         # Demo fallback
-        vendors = [
-            {"name": "Global Trade Logistics Ltd", "website": "https://example.com", "vendor_type": "Exporter", "snippet": "Leading supplier of industrial components in the region.", "trust_score": 0.92, "sells_product": True},
-            {"name": "Elite Sourcing Group", "website": "https://example.com", "vendor_type": "Manufacturer", "snippet": "Specialized manufacturing partner with ISO certification.", "trust_score": 0.88, "sells_product": True},
-            {"name": "TradeConnect Partners", "website": "https://example.com", "vendor_type": "Distributor", "snippet": "Established distribution network with local warehouse facilities.", "trust_score": 0.75, "sells_product": False}
-        ]
+        from demo_data import get_mock_vendors
+        vendors = get_mock_vendors(req.country)
     return {"vendors": vendors}
 
 
@@ -372,7 +369,6 @@ def get_news():
     """
     Fetch live tariff news and analyze them using the Policy Shock Engine.
     """
-    from policy_shock_engine import run_policy_shock_from_live_news
     try:
         from policy_shock_engine import run_policy_shock_from_live_news
         results = run_policy_shock_from_live_news(max_articles=3)
@@ -381,73 +377,8 @@ def get_news():
         return {"news": results}
     except Exception as e:
         print(f"Error fetching news: {e}. Using Demo Fallback.")
-        # Demo fallback for presentation - Aligned with Frontend Mapping
-        return {"news": [
-            {
-                "article": {
-                    "title": "US Implements New Section 301 Tariffs on Steel and Aluminum",
-                    "url": "#",
-                    "source": "Trade Insights Daily",
-                    "dateTime": "2026-03-25T10:00:00Z",
-                    "image": ""
-                },
-                "analysis": {
-                    "extracted_policy": {
-                        "headline": "Tariff Hike on Metal Imports",
-                        "affected_countries": ["USA", "China"],
-                        "tariff_direction": "increase",
-                        "estimated_tariff_delta_percent": 25.0,
-                        "affected_sectors": ["Steel", "Aluminum", "Automotive"],
-                        "likely_affected_hs_chapters": ["72 - Iron and Steel", "76 - Aluminum"],
-                        "effective_date": "April 1, 2026",
-                        "policy_type": "retaliatory"
-                    },
-                    "strategic_analysis": {
-                        "risk_level": "high",
-                        "risk_score": 8.5,
-                        "impact_summary": "Direct increase in landed costs for infrastructure and automotive components. Significant margin pressure expected for US manufacturers.",
-                        "winners": "Domestic steel producers",
-                        "losers": "Automotive OEMs, Construction firms",
-                        "recommended_actions": ["Accelerate existing orders before April 1", "Explore alternative sourcing from Mexico or Canada"],
-                        "alternative_sourcing_countries": ["Mexico", "Canada"],
-                        "timing_advice": "Act within 7 days",
-                        "confidence_in_interpretation": 0.95
-                    }
-                }
-            },
-            {
-                "article": {
-                    "title": "India and UK Finalize Landmark Free Trade Agreement",
-                    "url": "#",
-                    "source": "Global Trade Monitor",
-                    "dateTime": "2026-03-28T14:30:00Z",
-                    "image": ""
-                },
-                "analysis": {
-                    "extracted_policy": {
-                        "headline": "India-UK FTA Signed",
-                        "affected_countries": ["India", "UK"],
-                        "tariff_direction": "decrease",
-                        "estimated_tariff_delta_percent": -12.5,
-                        "affected_sectors": ["Textiles", "Machinery", "Whisky"],
-                        "likely_affected_hs_chapters": ["61 - Apparel", "84 - Machinery"],
-                        "effective_date": "January 1, 2027",
-                        "policy_type": "preferential"
-                    },
-                    "strategic_analysis": {
-                        "risk_level": "low",
-                        "risk_score": 2.0,
-                        "impact_summary": "Duty rates for textiles and machinery moving between both nations will drop significantly. Major opportunity for apparel exporters in India.",
-                        "winners": "Indian textile exporters, UK machinery manufacturers",
-                        "losers": "Traditional high-tariff competitors",
-                        "recommended_actions": ["Identify UK-based distribution partners", "Prepare Certificate of Origin documentation"],
-                        "alternative_sourcing_countries": ["UK"],
-                        "timing_advice": "Medium-term strategic planning",
-                        "confidence_in_interpretation": 0.90
-                    }
-                }
-            }
-        ]}
+        from demo_data import get_mock_news
+        return {"news": get_mock_news()}
 
 @app.post("/api/parse-document")
 async def parse_document(file: UploadFile = File(...)):

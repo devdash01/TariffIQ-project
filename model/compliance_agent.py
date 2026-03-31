@@ -194,52 +194,12 @@ Rules:
 
 def run_compliance_check(country: str, product_desc: str) -> dict | None:
     """
-    Main orchestration function.
-    1. Searches web via Tavily
-    2. Synthesizes via MegaLLM
-    3. Returns structured dict
+    Main orchestration function for compliance checks.
     """
     if not TAVILY_API_KEY or not MEGALLM_API_KEY:
         print("[INFO] API Keys missing. Using Demo Mode fallback for Compliance.")
-        return {
-            "product": product_desc,
-            "country": country,
-            "risk_level": "Medium",
-            "estimated_complexity": "6/10",
-            "summary_advice": "Ensure all technical documentation is translated to the local language. BIS and safety certifications are likely required for this category.",
-            "rules_of_origin_evaluation": [
-                {
-                    "rule_name": "Value Addition Threshold",
-                    "analysis": "Matches standard 40% local content requirement for most trade agreements.",
-                    "status": "Met"
-                },
-                {
-                    "rule_name": "Substantial Transformation",
-                    "analysis": "HS Chapter change confirmed for target product.",
-                    "status": "Met"
-                }
-            ],
-            "compliance_checklist": [
-                {
-                    "category": "Certifications & Standards",
-                    "requirement_title": "Local Quality Standard Certification",
-                    "description": "Obtain necessary safety and quality certifications from local regulatory bodies.",
-                    "is_mandatory": True
-                },
-                {
-                    "category": "Labelling & Packaging",
-                    "requirement_title": "Bilingual Labelling",
-                    "description": "All retail packaging must show country of origin and technical specs in English and local language.",
-                    "is_mandatory": True
-                },
-                {
-                    "category": "Customs Documentation",
-                    "requirement_title": "Certificate of Origin",
-                    "description": "Provide a valid Form A/B CO to claim preferential tariff rates.",
-                    "is_mandatory": True
-                }
-            ]
-        }
+        from demo_data import get_mock_compliance_report
+        return get_mock_compliance_report(country, product_desc)
 
     print(f"[INFO] Searching the web for {product_desc} compliance in {country}...")
     context = search_compliance_info(country, product_desc)
