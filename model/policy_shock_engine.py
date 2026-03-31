@@ -27,10 +27,12 @@ MEGALLM_API_KEY = os.getenv("GROQ_API_KEY") or os.getenv("MEGALLM_API_KEY")
 MEGALLM_BASE_URL = "https://api.groq.com/openai/v1" if os.getenv("GROQ_API_KEY") else None
 THENEWSAPI_API_KEY = os.getenv("THENEWSAPI_API_KEY")
 
-megallm_client = OpenAI(
-    api_key=MEGALLM_API_KEY,
-    base_url=MEGALLM_BASE_URL
-)
+megallm_client = None
+if MEGALLM_API_KEY:
+    megallm_client = OpenAI(
+        api_key=MEGALLM_API_KEY,
+        base_url=MEGALLM_BASE_URL
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════
