@@ -16,10 +16,10 @@ venv/
 env/
 .env
 
-# Data & Models (from previous gitignore)
-data/
+# Data & Models
+# data/             <-- Un-ignored for deployment
+# *.faiss           <-- Un-ignored for deployment
 *.npy
-*.faiss
 *.pkl
 *.h5
 *.model

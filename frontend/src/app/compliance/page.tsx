@@ -8,6 +8,7 @@ import {
     CheckSquare, Square, Download, RefreshCw, Info
 } from "lucide-react";
 import { useTradeContext } from "@/context/TradeContext";
+import { API_ENDPOINTS } from "@/config/api";
 
 const statusStyle = {
     Obtained: { bg: "#0f172a", color: "#fff" },
@@ -55,7 +56,7 @@ export default function Compliance() {
         const fetchCompliance = async () => {
             setLoading(true);
             try {
-                const res = await fetch("http://localhost:8000/api/compliance", {
+                const res = await fetch(API_ENDPOINTS.COMPLIANCE, {
                     method: "POST",
                     signal: AbortSignal.timeout(120000),
                     headers: { "Content-Type": "application/json" },

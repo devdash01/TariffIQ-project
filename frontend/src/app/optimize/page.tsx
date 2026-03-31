@@ -3,6 +3,7 @@ import PageShell from "@/components/PageShell";
 import TradeSummaryHeader from "@/components/TradeSummaryHeader";
 import { Sparkles, MapPin, TrendingUp, Zap, Target, RefreshCw, Building, ShieldCheck, AlertTriangle } from "lucide-react";
 import { useTradeContext } from "@/context/TradeContext";
+import { API_ENDPOINTS } from "@/config/api";
 import { useEffect, useState } from "react";
 
 const fmt = (n: any) => {
@@ -35,7 +36,7 @@ export default function Optimize() {
         setLoading(true);
         const fetchOptimization = async () => {
             try {
-                const res = await fetch("http://localhost:8000/api/landed-cost", {
+                const res = await fetch(API_ENDPOINTS.LANDED_COST, {
                     method: "POST",
                     signal: AbortSignal.timeout(120000),
                     headers: { "Content-Type": "application/json" },
@@ -71,7 +72,7 @@ export default function Optimize() {
         setVendorsLoading(true);
         const fetchVendors = async () => {
             try {
-                const res = await fetch("http://localhost:8000/api/vendors", {
+                const res = await fetch(API_ENDPOINTS.VENDORS, {
                     method: "POST",
                     signal: AbortSignal.timeout(120000),
                     headers: { "Content-Type": "application/json" },

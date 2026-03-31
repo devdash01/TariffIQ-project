@@ -4,6 +4,7 @@ import TradeSummaryHeader from "@/components/TradeSummaryHeader";
 import { useState, useEffect } from "react";
 import { Sparkles, CheckCircle, Brain, ShieldAlert, AlertTriangle, ChevronRight } from "lucide-react";
 import { useTradeContext } from "@/context/TradeContext";
+import { API_ENDPOINTS } from "@/config/api";
 
 export default function HSCode() {
     const { name, category, description, material, intendedUse, hsCode, dest, setTradeData } = useTradeContext();
@@ -29,7 +30,7 @@ export default function HSCode() {
             // Clear current HS code in context so it doesn't look "fixed" while we wait
             setTradeData({ hsCode: null });
 
-            const res = await fetch("http://localhost:8000/api/classify", {
+            const res = await fetch(API_ENDPOINTS.CLASSIFY, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 

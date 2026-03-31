@@ -4,6 +4,7 @@ import TradeSummaryHeader from "@/components/TradeSummaryHeader";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
 import { Calculator, FileText, Ship, Plane, RefreshCw, Zap } from "lucide-react";
 import { useTradeContext } from "@/context/TradeContext";
+import { API_ENDPOINTS } from "@/config/api";
 import { useEffect, useState } from "react";
 
 const highlightStyle = {
@@ -36,7 +37,7 @@ export default function LandedCost() {
             setLoading(true);
             setError(null);
             try {
-                const res = await fetch("http://localhost:8000/api/landed-cost", {
+                const res = await fetch(API_ENDPOINTS.LANDED_COST, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
