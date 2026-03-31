@@ -5,8 +5,8 @@ services:
     region: singapore # Closest to India for better performance
     plan: free
     numInstances: 1
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn server:app --host 0.0.0.0 --port $PORT"
+    buildCommand: "pip install -r model/requirements.txt"
+    startCommand: "uvicorn model.server:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.12
