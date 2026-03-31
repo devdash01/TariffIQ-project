@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "devCommand": "npm run dev",
+  "outputDirectory": ".next",
+  "ignore": [
+    "model",
+    "data",
+    "data_manipulation"
+  ]
+}
