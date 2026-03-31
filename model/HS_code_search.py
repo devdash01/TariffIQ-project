@@ -20,7 +20,7 @@ megallm_client = OpenAI(
     base_url=MEGALLM_BASE_URL
 )
 
-# === CONFIG ===
+# Configuration
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
 
 FAISS_INDEX_FILE = os.path.join(MODEL_DIR, "hs_index.faiss")
@@ -208,7 +208,7 @@ def main():
         print(f"{r['rank']:<6}{r['hs_code']:<12}{r['score']:<10}{desc}")
 
     # Step 2: LLM reranking
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 80)
     print("Reranking with LLM...\n")
     reranked = rerank_with_llm(query, results)
 
@@ -226,7 +226,7 @@ def main():
 
         analysis = reranked.get("analysis", {})
         if analysis:
-            print(f"\n  --- Analysis ---")
+            print("\n  --- Analysis ---")
             print(f"  Material/Composition:  {analysis.get('composition_or_material_analysis', 'N/A')}")
             print(f"  Function/Processing:   {analysis.get('functional_or_processing_analysis', 'N/A')}")
             print(f"  Exclusions:            {analysis.get('exclusion_of_alternatives', 'N/A')}")

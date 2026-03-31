@@ -341,14 +341,14 @@ def run_pipeline(product: str, country: str) -> list[dict]:
     # Sort final output by trust_score descending
     final_list.sort(key=lambda x: x.get("trust_score", 0.0), reverse=True)
 
-    print("\n🎉 Pipeline complete.")
+    print("\nPipeline complete.")
     return final_list
 
 
 if __name__ == "__main__":
     result = run_pipeline("Injection molding machine", "Vietnam")
     
-    print("\n============================================================")
+    print("\n------------------------------------------------------------")
     print("  FINAL VENDOR VERDICTS")
-    print("============================================================")
+    print("------------------------------------------------------------")
     print(json.dumps(result, indent=2))

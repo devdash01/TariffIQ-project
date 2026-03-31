@@ -14,24 +14,24 @@ def benchmark():
     WEIGHT_KG = 500
     PRODUCT_VALUE = 10000
 
-    print(f"🚀 Starting benchmark for HS {HS_CODE} → {MY_COUNTRY}...")
+    print(f"Starting benchmark for HS {HS_CODE} -> {MY_COUNTRY}...")
     
     # First run (uncached but parallel)
     start_time = time.time()
     results = compare_origins_live(HS_CODE, MY_COUNTRY, MODE, WEIGHT_KG, PRODUCT_VALUE)
     end_time = time.time()
-    print(f"⏱️  Run 1 (Parallel, Uncached): {end_time - start_time:.2f}s")
+    print(f"Run 1 (Parallel, Uncached): {end_time - start_time:.2f}s")
     
     # Second run (cached)
     start_time = time.time()
     results2 = compare_origins_live(HS_CODE, MY_COUNTRY, MODE, WEIGHT_KG, PRODUCT_VALUE)
     end_time = time.time()
-    print(f"⏱️  Run 2 (Cached): {end_time - start_time:.2f}s")
+    print(f"Run 2 (Cached): {end_time - start_time:.2f}s")
 
     if results:
-        print(f"✅ Comparison returned {len(results)} results.")
+        print(f"Comparison returned {len(results)} results.")
     else:
-        print("❌ Benchmark failed to return results.")
+        print("Benchmark failed to return results.")
 
 if __name__ == "__main__":
     benchmark()

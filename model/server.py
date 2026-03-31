@@ -28,7 +28,7 @@ import threading
 # Global lock for thread-safe model access
 model_lock = threading.Lock()
 
-# ── Ensure model/ is importable ──────────────────────────────────
+# Models and Import Setup
 MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 if MODEL_DIR not in sys.path:
     sys.path.insert(0, MODEL_DIR)
@@ -36,7 +36,7 @@ if MODEL_DIR not in sys.path:
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(MODEL_DIR), ".env"))
 
-# ── Lazy-loaded globals ──────────────────────────────────────────
+# Global Models and State
 faiss_index = None
 codes_df = None
 sentence_model = None
@@ -66,7 +66,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ── CORS ─────────────────────────────────────────────────────────
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
@@ -76,9 +76,8 @@ app.add_middleware(
 )
 
 
-# ══════════════════════════════════════════════════════════════════
-#  Request / Response Models
-# ══════════════════════════════════════════════════════════════════
+# Request / Response Schemas
+# ------------------------------------------------------------------
 
 class ClassifyRequest(BaseModel):
     product_description: str = Field(..., min_length=3, examples=["Cotton T-shirts, knitted, 100% cotton"])
@@ -104,9 +103,8 @@ class VendorRequest(BaseModel):
     country: str
 
 
-# ══════════════════════════════════════════════════════════════════
-#  Endpoints
-# ══════════════════════════════════════════════════════════════════
+# API Endpoints
+# ------------------------------------------------------------------
 
 @app.get("/api/health")
 def health():
@@ -528,9 +526,8 @@ async def parse_document(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Failed to parse document: {str(e)}")
 
 
-# ══════════════════════════════════════════════════════════════════
-#  Run with: uvicorn server:app --reload --port 8000
-# ══════════════════════════════════════════════════════════════════
+# Main execution
+# ------------------------------------------------------------------
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)

@@ -1,5 +1,5 @@
 """
-TariffAI — Shipping & Landed Cost Engine
+# TariffIQ — Shipping & Landed Cost Engine
 =========================================
 Deterministic, simulation-grade freight and landed cost calculator
 supporting cross-country trade analysis.
@@ -13,7 +13,7 @@ import os
 import pandas as pd
 from tarrif_lookup_engine import load_tariffs, get_tariff_rate, get_tariff_rate_live
 
-# ── Route Distances ─────────────────────────────────────────────────
+# Route Distances
 # Approximate trade-lane estimates (km). All routes are symmetric.
 
 AIR_DISTANCE_KM = {
@@ -64,7 +64,7 @@ SEA_DISTANCE_KM = {
     ("usa",     "vietnam"):  18000,
 }
 
-# ── Shipping Rate Benchmarks ───────────────────────────────────────
+# Shipping Rate Benchmarks
 
 SHIPPING_RATES = {
     "air": {
@@ -77,15 +77,15 @@ SHIPPING_RATES = {
     },
 }
 
-# ── Normalization Constant ──────────────────────────────────────────
+# Normalization Constant
 
 DISTANCE_NORM_KM = 5000   # global mid-range normalization constant
 
-# ── Supported Countries ────────────────────────────────────────────
+# Supported Countries
 
 SUPPORTED_COUNTRIES = ["china", "france", "india", "uae", "uk", "usa", "vietnam"]
 
-# ── Cross-Country Data ─────────────────────────────────────────────
+# Cross-Country Data
 
 CROSS_COUNTRY_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -117,7 +117,7 @@ FILE_NAME_MAP = {
     "vietnam": "vietnam",
 }
 
-# ── Global CSV Cache ───────────────────────────────────────────────
+# Global CSV Cache
 _CSV_CACHE = {}
 
 def load_cross_country_data(reporter: str, partner: str) -> pd.DataFrame | None:
@@ -144,9 +144,8 @@ def load_cross_country_data(reporter: str, partner: str) -> pd.DataFrame | None:
     return df
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  Core Functions
-# ═══════════════════════════════════════════════════════════════════
+# Core Functions
+# ------------------------------------------------------------------
 
 def _normalize(name: str) -> str:
     """Lowercase + strip a country name, and map to short name if possible."""
@@ -356,9 +355,8 @@ def calculate_landed_cost_live(
     return result
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  Cross-Country Data Functions
-# ═══════════════════════════════════════════════════════════════════
+# Cross-Country Data Functions
+# ------------------------------------------------------------------
 
 def lookup_landed_cost_by_country(
     hs_code: str,
@@ -484,21 +482,20 @@ def compare_origins_live(
     return results
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  Demo Run
-# ═══════════════════════════════════════════════════════════════════
+# Demo Run
+# ------------------------------------------------------------------
 
 if __name__ == "__main__":
-    # ── Constants — change these to test ────────────────────────────
+    # Constants
     HS_CODE       = "020422"
     MY_COUNTRY    = "india"       # you are the importer
     MODE          = "air"
     WEIGHT_KG     = 500
     PRODUCT_VALUE = 10000
-    # ────────────────────────────────────────────────────────────────
+    # ----------------------------------------------------------------
 
     print("=" * 70)
-    print("  TariffAI — Best Country to Buy From")
+    print("  TariffIQ - Sourcing Optimization")
     print("=" * 70)
     print(f"\n  You are in : {MY_COUNTRY.upper()} (importer)")
     print(f"  HS Code    : {HS_CODE}")
@@ -506,10 +503,10 @@ if __name__ == "__main__":
     print(f"  Weight     : {WEIGHT_KG} kg")
     print(f"  Value      : ${PRODUCT_VALUE:,.2f}")
 
-    # ── Single country lookup ──────────────────────────────────────
-    print(f"\n{'━' * 70}")
+    # Single country lookup
+    print("\n" + "-" * 70)
     print(f"  SINGLE LOOKUP: Buying from CHINA → {MY_COUNTRY.upper()}")
-    print(f"{'━' * 70}")
+    print("-" * 70)
 
     single = lookup_landed_cost_by_country(
         HS_CODE, origin="china", destination=MY_COUNTRY,
@@ -527,11 +524,11 @@ if __name__ == "__main__":
     else:
         print("  No data found.")
 
-    # ── Live Comparison mode ───────────────────────────────────────
-    print(f"\n{'━' * 70}")
+    # Live Comparison mode
+    print("\n" + "-" * 70)
     print(f"  LIVE WITS COMPARISON: Best country to buy from → {MY_COUNTRY.upper()}")
     print(f"  (Queries live preferential/FTA tariff rates from World Bank)")
-    print(f"{'━' * 70}")
+    print("-" * 70)
 
     live_results = compare_origins_live(
         HS_CODE, MY_COUNTRY, MODE, WEIGHT_KG, PRODUCT_VALUE
@@ -540,7 +537,7 @@ if __name__ == "__main__":
     if live_results:
         print(f"\n  {'Rank':<5} {'Buy From':<12} {'Dist (km)':<12} {'Shipping':<10} "
               f"{'Pref Margin':<12} {'AHS %':<8} {'Duty':<12} {'TOTAL':<12}")
-        print(f"  {'─' * 85}")
+        print("-" * 85)
 
         for i, r in enumerate(live_results, 1):
             src = r["route"].split(" → ")[0].upper()
@@ -559,8 +556,8 @@ if __name__ == "__main__":
             fta_note = f" (Includes {cheapest['preference_margin']}% FTA Discount!)"
         else:
             fta_note = ""
-        print(f"\n  💡 Best to buy from: {best_src} — saves ${savings:,.2f} vs costliest option{fta_note}")
+        print(f"\n[INFO] Best source: {best_src} - savings of ${savings:,.2f} versus costliest option{fta_note}")
     else:
         print("  No live comparison data found for this HS code.")
 
-    print(f"\n{'━' * 70}")
+    print("\n" + "-" * 70)

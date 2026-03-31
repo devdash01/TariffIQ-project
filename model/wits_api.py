@@ -16,7 +16,7 @@ API Docs: https://wits.worldbank.org/API/V1/SDMX/V21/rest/doc
 import requests
 from functools import lru_cache
 
-# ── Base URLs ───────────────────────────────────────────────────────
+# Base URLs
 TRADESTATS_BASE = (
     "https://wits.worldbank.org/API/V1/SDMX/V21"
     "/datasource/tradestats-tariff"
@@ -26,7 +26,7 @@ TRAINS_BASE = (
     "/datasource/TRN"
 )
 
-# ── ISO3 Alpha → UN Numeric Code Mapping ───────────────────────────
+# ISO3 Alpha to UN Numeric Code Mapping
 # Numeric codes are required by the TRN (TRAINS) SDMX endpoint.
 ISO3_TO_NUMERIC = {
     "USA": "840",  "IND": "356",  "GBR": "826",  "CHN": "156",
@@ -41,7 +41,8 @@ ISO3_TO_NUMERIC = {
     "PER": "604",  "NZL": "554",  "RUS": "643",  "WLD": "000",
 }
 
-# ── Friendly name → ISO3 mapping ───────────────────────────────────
+# Friendly name to ISO3 mapping
+# ------------------------------------------------------------------
 # Matches naming in shipping_landed_cost.py
 COUNTRY_NAME_TO_ISO3 = {
     "usa": "USA", "united states": "USA",
@@ -68,7 +69,8 @@ COUNTRY_NAME_TO_ISO3 = {
     "russia": "RUS",
 }
 
-# ── HS Chapter → WITS Product Group Mapping ────────────────────────
+# HS Chapter to WITS Product Group Mapping
+# ------------------------------------------------------------------
 # Maps 2-digit HS chapter ranges to WITS product group IDs used
 # by the tradestats-tariff endpoint.
 HS_CHAPTER_TO_PRODUCT_GROUP = {
@@ -148,9 +150,8 @@ def _resolve_iso3(code_or_name: str) -> str:
     )
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  Endpoint 1: TradeStats-Tariff (aggregate, reliable)
-# ═══════════════════════════════════════════════════════════════════
+# Endpoint 1: TradeStats-Tariff (aggregate, reliable)
+# ------------------------------------------------------------------
 
 @lru_cache(maxsize=128)
 def get_tradestats_tariff(
@@ -313,9 +314,8 @@ def get_tariff_for_hs_category(
     return None
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  Endpoint 2: TRN / TRAINS (HS-6, intermittently available)
-# ═══════════════════════════════════════════════════════════════════
+# Endpoint 2: TRN / TRAINS (HS-6, intermittently available)
+# ------------------------------------------------------------------
 
 @lru_cache(maxsize=128)
 def get_tariff_rate_trains(
@@ -329,7 +329,7 @@ def get_tariff_rate_trains(
     """
     Fetch a tariff rate at HS-6 granularity from the TRAINS endpoint.
 
-    ⚠️ NOTE: This endpoint is sometimes unavailable from the WITS side.
+    # NOTE: This endpoint is sometimes unavailable from the WITS side.
     Consider using get_tariff_for_hs_category() as a reliable fallback.
 
     Parameters
@@ -407,9 +407,8 @@ def get_tariff_rate_trains(
     return None
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  Smart Lookup: tries TRAINS first, falls back to TradeStats
-# ═══════════════════════════════════════════════════════════════════
+# Smart Lookup: tries TRAINS first, falls back to TradeStats
+# ------------------------------------------------------------------
 
 def get_tariff_rate(
     reporter: str,
