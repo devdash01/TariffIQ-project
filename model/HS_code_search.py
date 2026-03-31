@@ -75,9 +75,9 @@ def rerank_with_llm(product_description, candidates):
         - score (optional)
     """
 
-    if not MEGALLM_API_KEY:
+    if not MEGALLM_API_KEY or MEGALLM_API_KEY == "DEMO_MODE":
         # Graceful fallback: return top candidate as primary
-        print("Warning: AI API key not found. Using Demo Mode fallback.")
+        print("Warning: AI API key not found or DEMO_MODE active.")
         from demo_data import get_mock_hs_analysis
         return get_mock_hs_analysis(product_description, candidates)
 

@@ -304,8 +304,8 @@ def run_pipeline(product: str, country: str) -> list[dict]:
     if core_product != product:
         print(f"[INFO] Extracted core product for search: '{core_product}'")
         
-    if not TAVILY_API_KEY or not MEGALLM_API_KEY:
-        print("[INFO] API Keys missing. Using Demo Mode fallback for Vendor Discovery.")
+    if not TAVILY_API_KEY or not MEGALLM_API_KEY or TAVILY_API_KEY == "DEMO_MODE":
+        print("[INFO] API Keys missing or DEMO_MODE active. Using Demo Mode fallback for Vendor Discovery.")
         from demo_data import get_mock_vendors
         return get_mock_vendors(country)
 

@@ -196,8 +196,8 @@ def run_compliance_check(country: str, product_desc: str) -> dict | None:
     """
     Main orchestration function for compliance checks.
     """
-    if not TAVILY_API_KEY or not MEGALLM_API_KEY:
-        print("[INFO] API Keys missing. Using Demo Mode fallback for Compliance.")
+    if not TAVILY_API_KEY or not MEGALLM_API_KEY or TAVILY_API_KEY == "DEMO_MODE":
+        print("[INFO] API Keys missing or DEMO_MODE active. Using Demo Mode fallback for Compliance.")
         from demo_data import get_mock_compliance_report
         return get_mock_compliance_report(country, product_desc)
 
