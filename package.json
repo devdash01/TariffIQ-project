@@ -1,0 +1,16 @@
+{
+  "name": "tariffiq-prototype",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npx concurrently \"npm run dev --prefix frontend\" \"python model/server.py\"",
+    "frontend": "npm run dev --prefix frontend",
+    "backend": "python model/server.py"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "lucide-react": "^0.575.0",
+    "recharts": "^3.7.0"
+  }
+}

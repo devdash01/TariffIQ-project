@@ -1,0 +1,33 @@
+# Dependency directories
+node_modules/
+frontend/node_modules/
+jspm_packages/
+
+# Next.js build output
+.next/
+out/
+
+# Python cache & venv
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+
+# Data & Models (from previous gitignore)
+data/
+*.npy
+*.faiss
+*.pkl
+*.h5
+*.model
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
