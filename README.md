@@ -38,8 +38,3 @@ TariffIQ is an AI-powered optimization engine designed to automate HS-code class
    python server.py
    ```
 
-## Author
-Dakshh Goel
-
-## License
-Proprietary. Developed for Trade-Tech Hackathon 2026.
