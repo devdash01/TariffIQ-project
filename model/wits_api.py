@@ -92,7 +92,7 @@ HS_CHAPTER_TO_PRODUCT_GROUP = {
     (90, 99): "90-99_Miscellan",
 }
 
-# Reverse lookup: product group → human label
+# Reverse lookup: product group -> human label
 PRODUCT_GROUP_LABELS = {
     "01-05_Animal":    "Animal Products",
     "06-15_Vegetable": "Vegetable Products",
@@ -208,7 +208,7 @@ def get_tradestats_tariff(
 
     if response.status_code != 200:
         print(f"[WITS TradeStats] HTTP {response.status_code} for "
-              f"{reporter_iso3}→{partner_iso3} ({year})")
+              f"{reporter_iso3}->{partner_iso3} ({year})")
         return None
 
     try:
@@ -285,7 +285,7 @@ def get_tariff_for_hs_category(
     Get the aggregate tariff rate for the product category that contains
     a given HS-6 code. This uses the reliable TradeStats endpoint.
 
-    For example, HS 010620 → chapter 01 → "01-05_Animal" → returns
+    For example, HS 010620 -> chapter 01 -> "01-05_Animal" -> returns
     the MFN weighted average for "Animal Products".
 
     Returns
@@ -379,7 +379,7 @@ def get_tariff_rate_trains(
 
     if response.status_code != 200:
         print(f"[WITS TRAINS] HTTP {response.status_code} for "
-              f"{reporter_iso3}→{partner_iso3} HS:{hs6} ({year})")
+              f"{reporter_iso3}->{partner_iso3} HS:{hs6} ({year})")
         return None
 
     try:

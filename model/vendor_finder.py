@@ -2,24 +2,17 @@ import os
 import json
 import requests
 from dotenv import load_dotenv
-from openai import OpenAI
 from urllib.parse import urlparse
 
 load_dotenv()
 
-# AI Client Setup (Groq for free / MegaLLM fallback)
 MEGALLM_API_KEY = os.getenv("GROQ_API_KEY") or os.getenv("MEGALLM_API_KEY")
 MEGALLM_BASE_URL = "https://api.groq.com/openai/v1" if os.getenv("GROQ_API_KEY") else None
 
-if MEGALLM_API_KEY:
-    megallm_client = OpenAI(
-        api_key=MEGALLM_API_KEY,
-        base_url=MEGALLM_BASE_URL
-    )
-
-# Setup Tavily Client
 TAVILY_API_KEY = os.getenv("TAVILLY_API_KEY")
 TAVILY_ENDPOINT = "https://api.tavily.com/search"
+
+# Note: OpenAI and Tavily use local imports inside functions for stability.
 
 
 def _extract_core_product_name(product_desc: str) -> str:
@@ -31,7 +24,16 @@ def _extract_core_product_name(product_desc: str) -> str:
         return product_desc
         
     try:
-        response = megallm_client.chat.completions.create(
+        from openai import OpenAI
+        MEGALLM_API_KEY = os.getenv("GROQ_API_KEY") or os.getenv("MEGALLM_API_KEY")
+        MEGALLM_BASE_URL = "https://api.groq.com/openai/v1" if os.getenv("GROQ_API_KEY") else None
+
+        if not MEGALLM_API_KEY:
+            return product_desc
+
+        client = OpenAI(api_key=MEGALLM_API_KEY, base_url=MEGALLM_BASE_URL)
+        
+        response = client.chat.completions.create(
             model="llama-3.3-70b-versatile" if os.getenv("GROQ_API_KEY") else "gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a search query optimizer. Extract the core 2-4 word product name from the following long description. Do not include any adjectives about grade, quality, or use cases. Return ONLY the short product name, nothing else."},
@@ -269,7 +271,10 @@ Do not include markdown blocks, backticks, or conversational text. Output raw JS
 """
 
     try:
-        response = megallm_client.chat.completions.create(
+        from openai import OpenAI
+        client = OpenAI(api_key=MEGALLM_API_KEY, base_url=MEGALLM_BASE_URL)
+        
+        response = client.chat.completions.create(
             model="llama-3.3-70b-versatile" if os.getenv("GROQ_API_KEY") else "gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a strict data extraction AI. Output raw JSON only."},

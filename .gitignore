@@ -31,3 +31,11 @@ Thumbs.db
 # IDEs
 .vscode/
 .idea/
+# AI Artifacts
+.gemini/
+brain/
+implementation_plan.md
+task.md
+walkthrough.md
+scripts/dev.ps1
+tmp/

@@ -14,6 +14,7 @@ export default function HSCode() {
     const [classificationResult, setClassificationResult] = useState<any>(null);
     const [candidates, setCandidates] = useState<any[]>([]);
     const [override, setOverride] = useState("");
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     useEffect(() => {
         if (!name && !description) return; // Wait for context
@@ -22,7 +23,7 @@ export default function HSCode() {
 
     async function classify() {
         if (loading) return;
-        setLoading(true); setClassificationResult(null); setCandidates([]);
+        setLoading(true); setClassificationResult(null); setCandidates([]); setErrorMsg(null);
 
         try {
             const productString = `${name || ""} ${description || ""}`.trim();
@@ -38,9 +39,15 @@ export default function HSCode() {
                     destination: dest || "Select destination"
                 })
             });
+            
+            if (!res.ok) {
+                const errorData = await res.text();
+                throw new Error(`Server returned HTTP ${res.status}: ${errorData.substring(0, 100)}`);
+            }
+            
             const data = await res.json();
 
-            if (res.ok && data.results) {
+            if (data.results) {
                 // Use the backend's designated primary choice if available, otherwise fallback to first result
                 const bestCandidate = data.results.find((c: any) => String(c.hs_code) === String(data.primary_hs)) || data.results[0];
                 
@@ -68,9 +75,11 @@ export default function HSCode() {
                 }
             } else {
                 console.error("Classification failed:", data);
+                setErrorMsg("Classification failed. No results returned.");
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
+            setErrorMsg(err.message || "Failed to connect to the AI engine. The backend might have restarted due to memory limits.");
         } finally {
             setLoading(false);
         }
@@ -128,8 +137,19 @@ export default function HSCode() {
                 )}
             </div>
 
-            {/* Empty State */}
-            {!name && !description && !loading && !classificationResult && (
+            {/* Empty State / Error State */}
+            {errorMsg && !loading && (
+                <div className="glass-card card-shadow animate-fade-in-up" style={{ padding: 24, background: "#fef2f2", border: "1px solid #f87171", color: "#b91c1c", marginTop: 20 }}>
+                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                        <ShieldAlert size={20} />
+                        <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>Connection Error</p>
+                    </div>
+                    <p style={{ margin: "8px 0 0 32px", fontSize: 13 }}>{errorMsg}</p>
+                    <p style={{ margin: "16px 0 0 32px", fontSize: 13, opacity: 0.8 }}><strong>Pro-tip:</strong> If you are testing locally, make sure your specific API URL is configured in Vercel. If not, the Render Free Tier server may have restared during downloading.</p>
+                </div>
+            )}
+
+            {!name && !description && !loading && !classificationResult && !errorMsg && (
                 <div className="glass-card card-shadow animate-fade-in-up" style={{ padding: 36, textAlign: "center", marginTop: 20 }}>
                     <p style={{ fontSize: 14, color: "var(--text-muted)" }}>Please enter product details in the Trade Input page first.</p>
                 </div>

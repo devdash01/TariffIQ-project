@@ -1,7 +1,7 @@
 """
 TariffAI — Policy Shock Simulator
 ===================================
-Feed it a news article or headline → MegaLLM (GPT-4) extracts
+Feed it a news article or headline -> MegaLLM (GPT-4) extracts
 tariff policy details and provides strategic trade analysis.
 
 Optionally provide your own HS codes to get a personalized
@@ -36,7 +36,7 @@ if MEGALLM_API_KEY:
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  Step 1: Parse News → Extract Tariff Details via MegaLLM
+#  Step 1: Parse News -> Extract Tariff Details via MegaLLM
 # ═══════════════════════════════════════════════════════════════════
 
 def analyze_news(news_text: str) -> dict | None:
@@ -265,7 +265,7 @@ def run_personal_impact_live(
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  Full Pipeline: News → Analysis → Optional Personal Impact
+#  Full Pipeline: News -> Analysis -> Optional Personal Impact
 # ═══════════════════════════════════════════════════════════════════
 
 def run_policy_shock(
@@ -283,8 +283,8 @@ def run_policy_shock(
     """
     Main entry point.
 
-    1. Analyze news with MegaLLM → extract tariff details + strategic analysis
-    2. If HS codes provided → run before/after simulation
+    1. Analyze news with MegaLLM -> extract tariff details + strategic analysis
+    2. If HS codes provided -> run before/after simulation
 
     Returns combined result dict.
     """
@@ -318,7 +318,7 @@ def run_policy_shock(
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  Live News Pipeline: The News API → Analysis
+#  Live News Pipeline: The News API -> Analysis
 # ═══════════════════════════════════════════════════════════════════
 
 # Keywords tuned for tariff / trade-war / customs-duty news
@@ -508,8 +508,8 @@ if __name__ == "__main__":
             if "has_preference" in r:
                 pref = f"  ✅ FTA Discount: -{r['preference_margin']}% (MFN: {r['mfn_rate']}%)" if r["has_preference"] else "  ❌ No FTA Preference"
                 print(pref)
-            print(f"    Tariff: {r['baseline_tariff']}% → {r['new_tariff']}%")
-            print(f"    Landed: ${r['baseline_total']:,.2f} → ${r['new_total']:,.2f}")
+            print(f"    Tariff: {r['baseline_tariff']}% -> {r['new_tariff']}%")
+            print(f"    Landed: ${r['baseline_total']:,.2f} -> ${r['new_total']:,.2f}")
             print(f"    Impact: {icon} ${r['absolute_impact']:,.2f} ({r['percent_impact']}%)")
 
         if impact["skipped"]:

@@ -122,7 +122,7 @@ _CSV_CACHE = {}
 
 def load_cross_country_data(reporter: str, partner: str) -> pd.DataFrame | None:
     """
-    Load and cache the cross-country tariff CSV for a reporter→partner route.
+    Load and cache the cross-country tariff CSV for a reporter->partner route.
     """
     r = _normalize(reporter)
     p = _normalize(partner)
@@ -246,7 +246,7 @@ def calculate_landed_cost(
         return COUNTRY_NAME_MAP.get(n, n.title())
 
     return {
-        "route": f"{format_country(origin)} → {format_country(destination)}",
+        "route": f"{format_country(origin)} -> {format_country(destination)}",
         "mode": mode.strip().lower(),
         "distance_km": shipping["distance_km"],
         "distance_factor": shipping["distance_factor"],
@@ -505,7 +505,7 @@ if __name__ == "__main__":
 
     # Single country lookup
     print("\n" + "-" * 70)
-    print(f"  SINGLE LOOKUP: Buying from CHINA → {MY_COUNTRY.upper()}")
+    print(f"  SINGLE LOOKUP: Buying from CHINA -> {MY_COUNTRY.upper()}")
     print("-" * 70)
 
     single = lookup_landed_cost_by_country(
@@ -526,7 +526,7 @@ if __name__ == "__main__":
 
     # Live Comparison mode
     print("\n" + "-" * 70)
-    print(f"  LIVE WITS COMPARISON: Best country to buy from → {MY_COUNTRY.upper()}")
+    print(f"  LIVE WITS COMPARISON: Best country to buy from -> {MY_COUNTRY.upper()}")
     print(f"  (Queries live preferential/FTA tariff rates from World Bank)")
     print("-" * 70)
 
@@ -540,7 +540,7 @@ if __name__ == "__main__":
         print("-" * 85)
 
         for i, r in enumerate(live_results, 1):
-            src = r["route"].split(" → ")[0].upper()
+            src = r["route"].split(" -> ")[0].upper()
             best = " ← CHEAPEST" if i == 1 else ""
             pref = f"(-{r['preference_margin']}%)" if r.get('has_preference') else "None"
             
@@ -551,7 +551,7 @@ if __name__ == "__main__":
         cheapest = live_results[0]
         costliest = live_results[-1]
         savings = round(costliest["total_landed_cost"] - cheapest["total_landed_cost"], 2)
-        best_src = cheapest["route"].split(" → ")[0].upper()
+        best_src = cheapest["route"].split(" -> ")[0].upper()
         if cheapest.get('has_preference'):
             fta_note = f" (Includes {cheapest['preference_margin']}% FTA Discount!)"
         else:

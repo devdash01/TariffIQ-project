@@ -14,19 +14,10 @@ import json
 import re
 
 from dotenv import load_dotenv
-from openai import OpenAI
-from tavily import TavilyClient
 
 load_dotenv()
 
-TAVILY_API_KEY = os.getenv("TAVILLY_API_KEY")
-MEGALLM_API_KEY = os.getenv("GROQ_API_KEY") or os.getenv("MEGALLM_API_KEY")
-MEGALLM_BASE_URL = "https://api.groq.com/openai/v1" if os.getenv("GROQ_API_KEY") else None
-
-megallm_client = OpenAI(
-    api_key=MEGALLM_API_KEY,
-    base_url=MEGALLM_BASE_URL
-)
+# Note: OpenAI and TavilyClient are imported JIT inside functions to save RAM.
 
 
 def _compress_compliance_query(country: str, product_desc: str) -> str:
@@ -55,7 +46,16 @@ def _compress_compliance_query(country: str, product_desc: str) -> str:
         - Focus on keywords like 'import requirements', 'regulations', 'standards'.
         """
         
-        response = megallm_client.chat.completions.create(
+        from openai import OpenAI
+        MEGALLM_API_KEY = os.getenv("GROQ_API_KEY") or os.getenv("MEGALLM_API_KEY")
+        MEGALLM_BASE_URL = "https://api.groq.com/openai/v1" if os.getenv("GROQ_API_KEY") else None
+
+        client = OpenAI(
+            api_key=MEGALLM_API_KEY,
+            base_url=MEGALLM_BASE_URL
+        )
+        
+        response = client.chat.completions.create(
             model="llama-3.3-70b-versatile" if os.getenv("GROQ_API_KEY") else "gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a trade compliance search expert. Output ONLY the optimized search query."},
@@ -81,6 +81,8 @@ def search_compliance_info(country: str, product_desc: str) -> str:
     Search the web using Tavily for compliance, regulatory, 
     and certification requirements for the given product & country.
     """
+    from tavily import TavilyClient
+    TAVILY_API_KEY = os.getenv("TAVILLY_API_KEY")
     if not TAVILY_API_KEY:
         raise ValueError("TAVILLY_API_KEY not found. Add it to your .env file.")
 
@@ -117,8 +119,14 @@ def generate_compliance_checklist(country: str, product_desc: str, search_contex
     Pass the Tavily search context to MegaLLM to synthesize a
     structured JSON checklist of actionable compliance requirements.
     """
-    if not search_context:
+    from openai import OpenAI
+    MEGALLM_API_KEY = os.getenv("GROQ_API_KEY") or os.getenv("MEGALLM_API_KEY")
+    MEGALLM_BASE_URL = "https://api.groq.com/openai/v1" if os.getenv("GROQ_API_KEY") else None
+
+    if not search_context or not MEGALLM_API_KEY:
         return None
+
+    client = OpenAI(api_key=MEGALLM_API_KEY, base_url=MEGALLM_BASE_URL)
         
     prompt = f"""
 You are a senior global trade compliance officer.
@@ -165,7 +173,7 @@ Rules:
 """
 
     try:
-        response = megallm_client.chat.completions.create(
+        response = client.chat.completions.create(
             model="llama-3.3-70b-versatile" if os.getenv("GROQ_API_KEY") else "gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a senior global trade compliance officer. Respond with valid JSON only."},
@@ -196,6 +204,9 @@ def run_compliance_check(country: str, product_desc: str) -> dict | None:
     """
     Main orchestration function for compliance checks.
     """
+    TAVILY_API_KEY = os.getenv("TAVILLY_API_KEY")
+    MEGALLM_API_KEY = os.getenv("GROQ_API_KEY") or os.getenv("MEGALLM_API_KEY")
+
     if not TAVILY_API_KEY or not MEGALLM_API_KEY or TAVILY_API_KEY == "DEMO_MODE":
         print("[INFO] API Keys missing or DEMO_MODE active. Using Demo Mode fallback for Compliance.")
         from demo_data import get_mock_compliance_report
