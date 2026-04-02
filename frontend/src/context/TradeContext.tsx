@@ -53,17 +53,9 @@ export function TradeProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState(defaultState);
     const [mounted, setMounted] = useState(false);
 
-    // Load from localStorage on mount
+    // Load from localStorage on mount (DISABLED for clean starts)
     useEffect(() => {
         setMounted(true);
-        try {
-            const saved = localStorage.getItem("tarrifiq_trade_data");
-            if (saved) {
-                setState(JSON.parse(saved));
-            }
-        } catch (e) {
-            console.error("Failed to load trade data from localStorage", e);
-        }
     }, []);
 
     const setTradeData = (data: Partial<Omit<TradeContextType, "setTradeData" | "clearTradeData">>) => {
@@ -74,20 +66,12 @@ export function TradeProvider({ children }: { children: ReactNode }) {
             const clearHs = isProductChanging ? { hsCode: null } : {};
             
             const newState = { ...prev, ...data, ...clearHs };
-            try {
-                localStorage.setItem("tarrifiq_trade_data", JSON.stringify(newState));
-            } catch (e) {
-                console.error("Failed to save trade data to localStorage", e);
-            }
             return newState;
         });
     };
 
     const clearTradeData = () => {
         setState(defaultState);
-        try {
-            localStorage.removeItem("tarrifiq_trade_data");
-        } catch (e) { }
     };
 
     // Prevent hydration mismatch by not rendering or rendering default until mounted
