@@ -2,7 +2,9 @@
   "name": "tariffiq",
   "version": "1.0.0",
   "private": true,
-  "author": "Dakshh Goel",
+  "engines": {
+    "node": ">=20.8.0"
+  },
   "scripts": {
     "dev": "concurrently \"next dev\" \"python run_backend.py\"",
     "build": "next build",
@@ -11,21 +13,23 @@
     "backend": "python run_backend.py"
   },
   "dependencies": {
-    "lucide-react": "^0.575.0",
     "next": "^15.1.4",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "lucide-react": "^0.575.0",
     "recharts": "^2.13.3"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^15.1.4",
-    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }
