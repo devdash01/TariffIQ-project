@@ -4,11 +4,11 @@
   "private": true,
   "author": "Dakshh Goel",
   "scripts": {
-    "dev": "concurrently \"next dev\" \"python server_entry.py\"",
+    "dev": "concurrently \"next dev\" \"python run_backend.py\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "backend": "python server_entry.py"
+    "backend": "python run_backend.py"
   },
   "dependencies": {
     "lucide-react": "^0.575.0",
