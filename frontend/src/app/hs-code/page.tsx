@@ -145,7 +145,15 @@ export default function HSCode() {
                         <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>Connection Error</p>
                     </div>
                     <p style={{ margin: "8px 0 0 32px", fontSize: 13 }}>{errorMsg}</p>
-                    <p style={{ margin: "16px 0 0 32px", fontSize: 13, opacity: 0.8 }}><strong>Pro-tip:</strong> If you are testing locally, make sure your specific API URL is configured in Vercel. If not, the Render Free Tier server may have restared during downloading.</p>
+                    <div style={{ margin: "16px 0 0 32px", display: "flex", flexDirection: "column", gap: 12 }}>
+                        <p style={{ fontSize: 13, opacity: 0.8, margin: 0 }}><strong>Pro-tip:</strong> If you are testing locally, make sure your specific API URL is configured in Vercel. If not, the Render Free Tier server may have restarted during downloading.</p>
+                        <button 
+                            onClick={() => { setErrorMsg(null); classify(); }}
+                            style={{ alignSelf: "flex-start", padding: "8px 20px", borderRadius: 8, background: "#b91c1c", color: "#fff", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                        >
+                            Retry Connection (Wake up Server)
+                        </button>
+                    </div>
                 </div>
             )}
 
