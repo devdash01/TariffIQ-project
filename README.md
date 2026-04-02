@@ -24,17 +24,20 @@ TariffIQ is an AI-powered optimization engine designed to automate HS-code class
    cd TariffIQ
    ```
 
-2. **Frontend Setup:**
+2. **Setup and Launch:**
    ```bash
-   cd frontend
    npm install
    npm run dev
    ```
 
-3. **Backend Setup:**
+3. **Backend Service:**
+   The backend runs concurrently with the frontend via the main dev command, but can also be launched separately:
    ```bash
-   cd ../model
-   pip install -r requirements.txt
-   python server.py
+   python server_entry.py
    ```
 
+## Author
+Dakshh Goel
+
+## License
+Proprietary. Developed for Trade-Tech Hackathon 2026.
