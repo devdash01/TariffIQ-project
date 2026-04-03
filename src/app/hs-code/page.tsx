@@ -150,7 +150,7 @@ export default function HSCode() {
                             onClick={() => { setErrorMsg(null); classify(); }}
                             style={{ alignSelf: "flex-start", padding: "8px 20px", borderRadius: 8, background: "#b91c1c", color: "#fff", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
                         >
-                            Retry Connection (Wake up Server)
+                            Retry
                         </button>
                     </div>
                 </div>
