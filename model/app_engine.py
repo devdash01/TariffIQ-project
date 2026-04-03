@@ -25,8 +25,14 @@ app = FastAPI(
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all for demo-mode/prototype
-    allow_credentials=False, # Must be False if using ["*"]
+    allow_origins=[
+        "*", # Fallback
+        "https://tariffiq-project.vercel.app", 
+        "https://tariffiq-project-git-main-devdash01s-projects.vercel.app",
+        "https://tariffiq-project.vercel.app",
+        "http://localhost:3000"
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

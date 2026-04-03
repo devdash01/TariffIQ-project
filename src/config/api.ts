@@ -1,12 +1,12 @@
-/**
- * API Configuration
- * -----------------
- * During local development, the frontend talks to localhost:8000.
- * In production (Vercel), we set the NEXT_PUBLIC_API_URL environment 
- * variable to point to our Render backend.
- */
+const isProd = typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || !window.location.hostname.includes('localhost'));
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://tariffiq-api.onrender.com";
+const API_BASE_URL = isProd 
+  ? "https://tariffiq-api.onrender.com" 
+  : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000");
+
+if (typeof window !== 'undefined') {
+  console.log("🚀 TariffIQ API Link:", API_BASE_URL);
+}
 
 export const API_ENDPOINTS = {
   CLASSIFY: `${API_BASE_URL}/api/classify`,
