@@ -86,9 +86,7 @@ async def classify(req: ClassifyRequest):
 
     reranked = parsed if parsed else None
 
-    # HS lookup engine
-    import pandas as pd
-    import numpy as np
+    # HS lookup engine - Lazy load for RAM safety
     from tarrif_lookup_engine import get_tariff_rate, load_tariffs
     tariffs_df = load_tariffs()
 
@@ -165,6 +163,10 @@ def landed_cost(req: LandedCostRequest):
 
     hs_code = req.hs_code
     classification = None
+
+    # Lazy load for RAM safety
+    from tarrif_lookup_engine import load_tariffs
+    tariffs_df = load_tariffs()
 
     # Auto-classify if no HS code provided
     if not hs_code:

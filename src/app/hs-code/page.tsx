@@ -47,7 +47,7 @@ export default function HSCode() {
             
             const data = await res.json();
 
-            if (data.results) {
+            if (data && data.results) {
                 // Use the backend's designated primary choice if available, otherwise fallback to first result
                 const bestCandidate = data.results.find((c: any) => String(c.hs_code) === String(data.primary_hs)) || data.results[0];
                 
@@ -75,11 +75,11 @@ export default function HSCode() {
                 }
             } else {
                 console.error("Classification failed:", data);
-                setErrorMsg("Classification failed. No results returned.");
+                setErrorMsg("Classification failed. No results returned from AI.");
             }
         } catch (err: any) {
             console.error(err);
-            setErrorMsg(err.message || "Failed to connect to the AI engine. The backend might have restarted due to memory limits.");
+            setErrorMsg(`Connect Failure: ${err.message}. If the server is waking up, wait 45s and retry.`);
         } finally {
             setLoading(false);
         }

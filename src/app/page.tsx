@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import Link from 'next/link';
 import { ArrowRight, Globe, ShieldCheck, Sparkles, TrendingUp, Cpu, Activity, Clock } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -49,6 +49,19 @@ export default function LandingPage() {
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
+        
+        // Silent Wake-up Ping for Render Free Tier
+        const wakeUpBackend = async () => {
+            try {
+                // Pointing specifically to the health endpoint
+                await fetch("https://tariffiq-api.onrender.com/api/health", { mode: 'no-cors' });
+                console.log("Backend wake-up signal sent.");
+            } catch (e) {
+                // Silently ignore - this is just a 'nudge'
+            }
+        };
+        wakeUpBackend();
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
