@@ -13,7 +13,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/render-api/:path*',
+        source: '/v2-ai-handshake/:path*',
         destination: 'https://tariffiq-api.onrender.com/api/:path*',
       },
     ];

@@ -143,10 +143,14 @@ export default function HSCode() {
                 <div className="glass-card card-shadow animate-fade-in-up" style={{ padding: 48, textAlign: "center", marginTop: 20 }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
                         <div className="loading-spinner" style={{ width: 40, height: 40, border: "3px solid rgba(59,130,246,0.1)", borderTop: "3px solid #3b82f6", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-                        <p style={{ margin: 0, fontWeight: 600, color: "#64748b" }}>Analyzing product features...</p>
-                        <p style={{ fontSize: 12, opacity: 0.7, margin: 0 }}>The AI engine is initializing. This may take up to 45s on first load.</p>
+                        <p style={{ margin: 0, fontWeight: 600, color: "#64748b" }}>Classifying product...</p>
                     </div>
                 </div>
+            )}
+            
+            {/* Small status dot in corner during V2 Handshake */}
+            {loading && (
+                <div style={{ position: "fixed", bottom: 20, right: 20, width: 8, height: 8, borderRadius: "50%", background: "#3b82f6", boxShadow: "0 0 10px #3b82f6", opacity: 0.6 }} />
             )}
 
             {!name && !description && !loading && !classificationResult && !errorMsg && (

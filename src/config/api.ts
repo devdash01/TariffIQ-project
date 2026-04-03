@@ -1,11 +1,11 @@
 const isProd = typeof window !== 'undefined' && 
   (window.location.hostname.includes('vercel.app') || !window.location.hostname.includes('localhost'));
 
-// Use local proxy in production to bypass CORS/Browser blocks
-const API_BASE_URL = isProd ? "/render-api" : "http://localhost:8000";
+// Use local proxy in production (Vercel) to bypass CORS blocks
+const API_BASE_URL = isProd ? "/v2-ai-handshake" : "http://localhost:8000";
 
 if (typeof window !== 'undefined' && isProd) {
-  console.log("🛡️ TariffIQ: Using Server-Side Proxy Handshake");
+  console.log("🛡️ TariffIQ: V2 Handshake Handled");
 }
 
 export const API_ENDPOINTS = {
