@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import Link from 'next/link';
 import { ArrowRight, Globe, ShieldCheck, Sparkles, TrendingUp, Cpu, Activity, Clock } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -373,7 +373,7 @@ export default function LandingPage() {
             <footer style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '40px 32px', textAlign: 'center', color: '#64748b', fontSize: '14px', position: 'relative', zIndex: 10 }}>
                 <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Activity size={16} /> TariffIQ © 2026. All rights reserved.
+                        <Activity size={16} /> TariffIQ Â© 2026. All rights reserved.
                     </div>
                     <div style={{ display: 'flex', gap: 24 }}>
                         <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</a>
@@ -393,5 +393,3 @@ export default function LandingPage() {
         </div>
     );
 }
- 
- 
