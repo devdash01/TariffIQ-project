@@ -6,7 +6,7 @@
  * variable to point to our Render backend.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://tariffiq-api.onrender.com";
 
 export const API_ENDPOINTS = {
   CLASSIFY: `${API_BASE_URL}/api/classify`,
