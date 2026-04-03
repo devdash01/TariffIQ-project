@@ -10,6 +10,14 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/render-api/:path*',
+        destination: 'https://tariffiq-api.onrender.com/api/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

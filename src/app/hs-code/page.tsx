@@ -138,20 +138,13 @@ export default function HSCode() {
             </div>
 
             {/* Empty State / Error State */}
-            {errorMsg && !loading && (
-                <div className="glass-card card-shadow animate-fade-in-up" style={{ padding: 24, background: "#fef2f2", border: "1px solid #f87171", color: "#b91c1c", marginTop: 20 }}>
-                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                        <ShieldAlert size={20} />
-                        <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>Connection Error</p>
-                    </div>
-                    <p style={{ margin: "8px 0 0 32px", fontSize: 13 }}>{errorMsg}</p>
-                    <div style={{ margin: "16px 0 0 32px", display: "flex", flexDirection: "column", gap: 12 }}>
-                        <button 
-                            onClick={() => { setErrorMsg(null); classify(); }}
-                            style={{ alignSelf: "flex-start", padding: "8px 20px", borderRadius: 8, background: "#b91c1c", color: "#fff", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
-                        >
-                            Retry
-                        </button>
+            {/* Loading / Processing State */}
+            {loading && (
+                <div className="glass-card card-shadow animate-fade-in-up" style={{ padding: 48, textAlign: "center", marginTop: 20 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+                        <div className="loading-spinner" style={{ width: 40, height: 40, border: "3px solid rgba(59,130,246,0.1)", borderTop: "3px solid #3b82f6", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+                        <p style={{ margin: 0, fontWeight: 600, color: "#64748b" }}>Analyzing product features...</p>
+                        <p style={{ fontSize: 12, opacity: 0.7, margin: 0 }}>The AI engine is initializing. This may take up to 45s on first load.</p>
                     </div>
                 </div>
             )}
