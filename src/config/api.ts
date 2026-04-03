@@ -1,11 +1,8 @@
-const isProd = typeof window !== 'undefined' && 
-  (window.location.hostname.includes('vercel.app') || !window.location.hostname.includes('localhost'));
+// Force production-mode for Vercel deployment
+const API_BASE_URL = "/v2-ai-handshake";
 
-// Use local proxy in production (Vercel) to bypass CORS blocks
-const API_BASE_URL = isProd ? "/v2-ai-handshake" : "http://localhost:8000";
-
-if (typeof window !== 'undefined' && isProd) {
-  console.log("🛡️ TariffIQ: V2 Handshake Handled");
+if (typeof window !== 'undefined') {
+  console.log("🛡️ TariffIQ: Forced V2 Handshake");
 }
 
 export const API_ENDPOINTS = {

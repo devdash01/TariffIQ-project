@@ -148,9 +148,12 @@ export default function HSCode() {
                 </div>
             )}
             
-            {/* Small status dot in corner during V2 Handshake */}
+            {/* Subtle status dot: Blue when loading, Green when connected, Hidden otherwise */}
             {loading && (
-                <div style={{ position: "fixed", bottom: 20, right: 20, width: 8, height: 8, borderRadius: "50%", background: "#3b82f6", boxShadow: "0 0 10px #3b82f6", opacity: 0.6 }} />
+                <div style={{ position: "fixed", bottom: 20, right: 20, width: 10, height: 10, borderRadius: "50%", background: "#3b82f6", boxShadow: "0 0 15px #3b82f6", opacity: 0.8 }} />
+            )}
+            {classificationResult && !loading && (
+                 <div style={{ position: "fixed", bottom: 20, right: 20, width: 10, height: 10, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 15px #10b981", opacity: 0.8 }} />
             )}
 
             {!name && !description && !loading && !classificationResult && !errorMsg && (
