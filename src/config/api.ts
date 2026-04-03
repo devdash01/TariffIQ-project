@@ -1,18 +1,19 @@
 // Force production-mode for Vercel deployment
-const API_BASE_URL = "/v2-ai-handshake";
-
-if (typeof window !== 'undefined') {
-  console.log("🛡️ TariffIQ: Forced V2 Handshake");
-}
+const PROXY_PATH = "/v2-ai-handshake";
 
 export const API_ENDPOINTS = {
-  CLASSIFY: `${API_BASE_URL}/classify`,
-  LANDED_COST: `${API_BASE_URL}/landed-cost`,
-  COMPLIANCE: `${API_BASE_URL}/compliance`,
-  VENDORS: `${API_BASE_URL}/vendors`,
-  NEWS: `${API_BASE_URL}/news`,
-  PARSE_DOCUMENT: `${API_BASE_URL}/parse-document`,
-  HEALTH: `${API_BASE_URL}/health`,
+  // Direct Vercel-Native AI Bridge (No-Fail Path)
+  CLASSIFY: "/api/classify",
+  
+  // Render Proxy Paths (Advanced Services)
+  LANDED_COST: `${PROXY_PATH}/landed-cost`,
+  COMPLIANCE: `${PROXY_PATH}/compliance`,
+  VENDORS: `${PROXY_PATH}/vendors`,
+  NEWS: `${PROXY_PATH}/news`,
+  PARSE_DOCUMENT: `${PROXY_PATH}/parse-document`,
+  HEALTH: `${PROXY_PATH}/health`,
 };
+
+const API_BASE_URL = PROXY_PATH;
 
 export default API_BASE_URL;
