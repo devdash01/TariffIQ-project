@@ -4,6 +4,7 @@ import {
     PieChart, Pie, Cell, ResponsiveContainer,
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
+import { useTradeContext } from "@/context/TradeContext";
 
 const landedCostData = [
     { name: 'Product Cost', value: 71, color: '#3b82f6' },
@@ -22,6 +23,40 @@ const routeComparisonData = [
 ];
 
 export function ChartsSection() {
+    const { landedCost, scenarios } = useTradeContext();
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => { setMounted(true); }, []);
+
+    if (!mounted) return <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[400px]" />;
+
+    // Prepare dynamic landed cost data
+    let dynamicLandedCostData = landedCostData;
+    if (landedCost) {
+        const total = landedCost.total_landed_cost;
+        dynamicLandedCostData = [
+            { name: 'Product Cost', value: Math.round((landedCost.product_value / total) * 100), color: '#3b82f6' },
+            { name: 'Customs Duty', value: Math.round((landedCost.import_duty / total) * 100), color: '#a855f7' },
+            { name: 'Import Tax', value: Math.round((landedCost.import_vat / total) * 100), color: '#06b6d4' },
+            { name: 'Freight', value: Math.round((landedCost.shipping_cost / total) * 100), color: '#10b981' },
+            { name: 'Insurance', value: Math.round((landedCost.insurance_cost / total) * 100), color: '#f59e0b' },
+            { name: 'Handling/Fees', value: Math.round(((landedCost.handling_fees + landedCost.doc_fees) / total) * 100), color: '#ec4899' },
+        ].filter(d => d.value > 0);
+    }
+
+    // Prepare dynamic comparison data
+    let dynamicComparisonData = routeComparisonData;
+    if (scenarios && scenarios.length > 0) {
+        dynamicComparisonData = scenarios.map((s, i) => ({
+            name: s.route.split(" -> ")[0] + (s.mode === 'air' ? ' (Air)' : ''),
+            cost: s.total_landed_cost,
+            color: i === 0 ? '#3b82f6' : '#10b981'
+        })).slice(0, 4);
+    }
+
+    const bestScenario = scenarios && scenarios.length > 0 
+        ? [...scenarios].sort((a, b) => a.total_landed_cost - b.total_landed_cost)[0]
+        : null;
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Landed Cost Breakdown */}
@@ -36,7 +71,7 @@ export function ChartsSection() {
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
-                                    data={landedCostData}
+                                    data={dynamicLandedCostData}
                                     cx="50%"
                                     cy="50%"
                                     innerRadius={70}
@@ -46,7 +81,7 @@ export function ChartsSection() {
                                     animationBegin={0}
                                     animationDuration={1500}
                                 >
-                                    {landedCostData.map((entry, index) => (
+                                    {dynamicLandedCostData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                                     ))}
                                 </Pie>
@@ -55,7 +90,7 @@ export function ChartsSection() {
                     </div>
                     
                     <div className="flex-1 flex flex-col gap-3.5">
-                        {landedCostData.map((item) => (
+                        {dynamicLandedCostData.map((item) => (
                             <div key={item.name} className="flex items-center justify-between group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
@@ -79,7 +114,7 @@ export function ChartsSection() {
 
                 <div className="flex-1 h-64">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={routeComparisonData}>
+                        <BarChart data={dynamicComparisonData}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
                             <XAxis 
                                 dataKey="name" 
@@ -112,7 +147,7 @@ export function ChartsSection() {
                                 animationBegin={300}
                                 animationDuration={1200}
                             >
-                                {routeComparisonData.map((entry, index) => (
+                                {dynamicComparisonData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={entry.color} />
                                 ))}
                             </Bar>
@@ -123,9 +158,15 @@ export function ChartsSection() {
                 <div className="mt-8 p-5 rounded-2xl bg-success/5 border border-success/10 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                        <span className="text-[15px] font-extrabold text-success tracking-tight">Best: India → United States Sea — $11,500</span>
+                        <span className="text-[15px] font-extrabold text-success tracking-tight">
+                            Best: {bestScenario ? `${bestScenario.route.split(" -> ")[0]} — $${bestScenario.total_landed_cost.toLocaleString()}` : "India → US — $11,500"}
+                        </span>
                     </div>
-                    <span className="text-[11px] font-black text-success px-3 py-1 rounded-full bg-success/10 border border-success/20 uppercase tracking-widest shadow-sm">-15% savings</span>
+                    {bestScenario && (
+                        <span className="text-[11px] font-black text-success px-3 py-1 rounded-full bg-success/10 border border-success/20 uppercase tracking-widest shadow-sm">
+                            Best ROI Route
+                        </span>
+                    )}
                 </div>
             </div>
         </div>

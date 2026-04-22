@@ -102,8 +102,14 @@ export default function TradeInput() {
         origin: tradeContext.origin || ORIGINS[0],
         dest: tradeContext.dest || DESTS[0],
         transport: tradeContext.transport || TRANSPORTS[0],
+        manualHsCode: tradeContext.manualHsCode || "",
     });
-    const set = (k: keyof typeof f) => (v: string) => { setF(p => ({ ...p, [k]: v })); };
+    
+    const set = (k: keyof typeof f) => (v: string) => { 
+        setF(p => ({ ...p, [k]: v }));
+        // Sync with context in real-time
+        tradeContext.setTradeData({ [k]: v });
+    };
 
     const [running, setRunning] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
@@ -113,11 +119,45 @@ export default function TradeInput() {
     const handleFile = async (file: File) => {
         if (!file || file.type !== "application/pdf") return;
         setIsParsing(true);
-        setTimeout(() => {
+        setUploadSuccess(false);
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await fetch("/api/parse-document", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.extracted_data) {
+                    const d = data.extracted_data;
+                    setF(p => ({
+                        ...p,
+                        name: d.name || p.name,
+                        category: CATEGORIES.includes(d.category) ? d.category : "Other",
+                        customCategory: d.category === "Other" ? (d.customCategory || "") : "",
+                        description: d.description || p.description,
+                        material: d.material || p.material,
+                        intendedUse: d.intendedUse || p.intendedUse,
+                        value: d.value?.toString() || p.value,
+                        qty: d.qty?.toString() || p.qty,
+                        weight: d.weight?.toString() || p.weight,
+                        dimensions: d.dimensions || p.dimensions,
+                        origin: ALL_COUNTRIES.includes(d.origin) ? d.origin : p.origin,
+                        dest: ALL_COUNTRIES.includes(d.dest) ? d.dest : p.dest,
+                    }));
+                    setUploadSuccess(true);
+                    setTimeout(() => setUploadSuccess(false), 3000);
+                }
+            }
+        } catch (err) {
+            console.error("Failed to parse document:", err);
+        } finally {
             setIsParsing(false);
-            setUploadSuccess(true);
-            setTimeout(() => setUploadSuccess(false), 3000);
-        }, 1500);
+        }
     };
 
     const canRun = !!(f.name && f.value && f.qty && f.origin !== ORIGINS[0] && f.dest !== DESTS[0] && f.transport !== TRANSPORTS[0]);
@@ -265,6 +305,9 @@ export default function TradeInput() {
                                 </div>
                                 <Field label="Transport Mode" required>
                                     <Select options={TRANSPORTS} value={f.transport} onChange={set("transport")} />
+                                </Field>
+                                <Field label="Manual HS Code (Optional)">
+                                    <Input placeholder="e.g., 8471.30" value={f.manualHsCode} onChange={set("manualHsCode")} />
                                 </Field>
                             </div>
                         </div>

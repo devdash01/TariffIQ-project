@@ -1,24 +1,95 @@
 "use client";
 import PageShell from "@/components/PageShell";
-import { ShieldCheck, AlertTriangle, CheckCircle2, Info, ChevronRight, FileText, Scale, Globe2, Search } from "lucide-react";
+import { ShieldCheck, AlertTriangle, CheckCircle2, Info, ChevronRight, FileText, Scale, Globe2, Search, RefreshCw, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useTradeContext } from "@/context/TradeContext";
 
-const complianceRules = [
-    { id: 1, category: "Sanctions & Restricted Parties", title: "Global Sanctions Check", status: "pass", description: "All parties in this trade route (Origin: Vietnam, Dest: USA) are clear of international sanction lists." },
-    { id: 2, category: "Product Regulations", title: "FDA Bioterrorism Act Compliance", status: "review", description: "Food-grade items require prior notice filing with the FDA. Registration number needs verification." },
-    { id: 3, category: "Import Duties", title: "Section 301 Tariff Evaluation", status: "pass", description: "Product is not subject to Section 301 additional duties for Vietnam origin." },
-    { id: 4, category: "Documentation", title: "Certificate of Origin (Form D)", status: "review", description: "Preferential duty rates require a valid Form D. Please upload to confirm eligibility." },
-];
-
-const metrics = [
-    { label: "Overall Risk", value: "Low", color: "text-success", bgColor: "bg-success/10", icon: ShieldCheck },
-    { label: "Active Rules", value: "24", color: "text-blue-500", bgColor: "bg-blue-500/10", icon: Scale },
-    { label: "Critical Alerts", value: "0", color: "text-success", bgColor: "bg-success/10", icon: AlertTriangle },
-    { label: "Review Required", value: "2", color: "text-warning", bgColor: "bg-warning/10", icon: Info },
-    { label: "Certifications", value: "3/4", color: "text-purple-500", bgColor: "bg-purple-500/10", icon: FileText },
-    { label: "Global Coverage", value: "100%", color: "text-cyan-500", bgColor: "bg-cyan-500/10", icon: Globe2 },
-];
+const ChecklistItem = ({ rule }: { rule: any }) => {
+    const [checked, setChecked] = useState(false);
+    return (
+        <div 
+            onClick={() => setChecked(!checked)}
+            className={`glass-card p-6 bg-card border hover:border-primary/30 transition-all group cursor-pointer ${checked ? 'opacity-60 border-success/30 bg-success/[0.01]' : 'border-border'}`}
+        >
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${checked ? 'bg-success border-success text-white' : 'bg-transparent border-border'}`}>
+                            {checked && <CheckCircle2 size={12} strokeWidth={3} />}
+                        </div>
+                        <span className="text-[10px] font-black text-primary uppercase tracking-widest px-2 py-0.5 bg-primary/10 rounded">{rule.category || "General"}</span>
+                        {rule.is_mandatory && (
+                            <span className="flex items-center gap-1 text-[10px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-2 py-0.5 rounded">
+                                <AlertTriangle size={12} /> Mandatory
+                            </span>
+                        )}
+                    </div>
+                    <h3 className={`text-lg font-bold mb-2 transition-colors ${checked ? 'text-success' : 'text-foreground'}`}>{rule.requirement_title || rule.title}</h3>
+                    <p className="text-sm text-muted-foreground font-medium leading-relaxed">{rule.description}</p>
+                    
+                    {rule.ai_suggestion && (
+                        <div className="mt-4 p-3 rounded-xl bg-primary/5 border border-primary/10 flex gap-3">
+                            <Zap size={14} className="text-primary shrink-0 mt-0.5" />
+                            <div>
+                                <div className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">AI Recommendation</div>
+                                <p className="text-[11px] text-foreground font-medium leading-relaxed italic">{rule.ai_suggestion}</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export default function Compliance() {
+    const { dest, description, name, origin } = useTradeContext();
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState<any>(null);
+
+    useEffect(() => {
+        if (!dest || (!description && !name)) return;
+
+        const fetchCompliance = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch("/api/compliance", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        destination: dest,
+                        product_description: description || name
+                    })
+                });
+                if (res.ok) {
+                    const json = await res.json();
+                    setData(json);
+                }
+            } catch (err) {
+                console.error("Compliance fetch failed:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCompliance();
+    }, [dest, description, name]);
+
+    const checklist = data?.compliance_checklist || [
+        { id: 1, category: "Sanctions", title: "Global Sanctions Check", status: "pass", description: "All parties clear of international sanction lists.", is_mandatory: true },
+        { id: 2, category: "Customs", title: "Certificate of Origin", status: "review", description: "Preferential duty rates require a valid Form D.", is_mandatory: true },
+        { id: 3, category: "Regulations", title: "Technical Standards", status: "pass", description: "Product matches destination safety standards.", is_mandatory: false }
+    ];
+
+    const metrics = [
+        { label: "Overall Risk", value: data?.risk_level || "Low", color: "text-success", bgColor: "bg-success/10", icon: ShieldCheck },
+        { label: "Active Rules", value: checklist.length, color: "text-blue-500", bgColor: "bg-blue-500/10", icon: Scale },
+        { label: "Complexity", value: `${data?.estimated_complexity || 4}/10`, color: "text-warning", bgColor: "bg-warning/10", icon: Info },
+        { label: "Mandatory", value: checklist.filter((r:any) => r.is_mandatory).length, color: "text-red-500", bgColor: "bg-red-500/10", icon: AlertTriangle },
+        { label: "Origin Rules", value: data?.rules_of_origin_evaluation?.length || 0, color: "text-purple-500", bgColor: "bg-purple-500/10", icon: FileText },
+        { label: "Global Sync", value: "100%", color: "text-cyan-500", bgColor: "bg-cyan-500/10", icon: Globe2 },
+    ];
+
     return (
         <PageShell title="Compliance & Regulatory">
             {/* Score Banner */}
@@ -35,10 +106,10 @@ export default function Compliance() {
                             <span className="text-sm font-black text-success uppercase tracking-widest">Compliance Health Score</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-4">
-                            94<span className="text-success text-2xl ml-1">/100</span>
+                            {loading ? "..." : (data ? 100 - (data.estimated_complexity * 8) : 94)}<span className="text-success text-2xl ml-1">/100</span>
                         </h1>
                         <p className="text-slate-400 text-lg font-medium max-w-xl leading-relaxed">
-                            Your trade route is highly compliant. Only 2 minor documentation reviews are pending to reach perfect standing.
+                            {data?.summary_advice || "Your trade route is being analyzed. Stay compliant with real-time AI regulatory checks."}
                         </p>
                     </div>
 
@@ -61,7 +132,7 @@ export default function Compliance() {
                             <m.icon size={20} />
                         </div>
                         <div>
-                            <div className="text-2xl font-black text-foreground tracking-tight">{m.value}</div>
+                            <div className="text-2xl font-black text-foreground tracking-tight">{loading ? "..." : m.value}</div>
                             <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">{m.label}</div>
                         </div>
                     </div>
@@ -74,9 +145,10 @@ export default function Compliance() {
                 <div className="lg:col-span-2 space-y-6 animate-fade-in-up delay-200">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl font-black text-foreground tracking-tight flex items-center gap-3">
-                            Regulatory Checklist <span className="px-3 py-1 bg-muted rounded-full text-xs text-muted-foreground">4 Rules</span>
+                            Regulatory Checklist <span className="px-3 py-1 bg-muted rounded-full text-xs text-muted-foreground">{checklist.length} Rules</span>
                         </h2>
                         <div className="flex items-center gap-2">
+                            {loading && <RefreshCw size={16} className="animate-spin text-primary" />}
                             <div className="relative group">
                                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                 <input placeholder="Filter rules..." className="pl-9 pr-4 py-2 rounded-xl bg-muted/50 border border-border text-xs outline-none focus:border-primary" />
@@ -85,30 +157,8 @@ export default function Compliance() {
                     </div>
 
                     <div className="space-y-4">
-                        {complianceRules.map((rule) => (
-                            <div key={rule.id} className="glass-card p-6 bg-card border border-border hover:border-primary/30 transition-all group">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-[10px] font-black text-primary uppercase tracking-widest px-2 py-0.5 bg-primary/10 rounded">{rule.category}</span>
-                                            {rule.status === 'pass' ? (
-                                                <span className="flex items-center gap-1 text-[10px] font-black text-success uppercase tracking-widest">
-                                                    <CheckCircle2 size={12} /> Passed
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-1 text-[10px] font-black text-warning uppercase tracking-widest animate-pulse">
-                                                    <AlertTriangle size={12} /> Needs Review
-                                                </span>
-                                            )}
-                                        </div>
-                                        <h3 className="text-lg font-bold text-foreground mb-2">{rule.title}</h3>
-                                        <p className="text-sm text-muted-foreground font-medium leading-relaxed">{rule.description}</p>
-                                    </div>
-                                    <button className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-white transition-all">
-                                        <ChevronRight size={20} />
-                                    </button>
-                                </div>
-                            </div>
+                        {checklist.map((rule: any, i: number) => (
+                            <ChecklistItem key={i} rule={rule} />
                         ))}
                     </div>
                 </div>
@@ -123,10 +173,12 @@ export default function Compliance() {
                             </div>
                             <div className="absolute top-4 left-4 p-3 bg-white/80 backdrop-blur border border-border rounded-xl shadow-sm">
                                 <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Selected Region</div>
-                                <div className="text-sm font-bold text-foreground">Vietnam (VN)</div>
+                                <div className="text-sm font-bold text-foreground">{dest || "Vietnam (VN)"}</div>
                                 <div className="flex items-center gap-1 mt-1">
-                                    <div className="w-2 h-2 rounded-full bg-success" />
-                                    <span className="text-[10px] font-bold text-success uppercase">Low Risk</span>
+                                    <div className={`w-2 h-2 rounded-full ${data?.risk_level === 'High' ? 'bg-red-500' : 'bg-success'}`} />
+                                    <span className={`text-[10px] font-bold uppercase ${data?.risk_level === 'High' ? 'text-red-500' : 'text-success'}`}>
+                                        {data?.risk_level || "Low"} Risk
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -136,8 +188,8 @@ export default function Compliance() {
                                 <span>Level</span>
                             </div>
                             {[
-                                { label: "Political Stability", level: 20, color: "bg-success" },
-                                { label: "Regulatory Quality", level: 35, color: "bg-success" },
+                                { label: "Political Stability", level: data?.risk_level === 'High' ? 65 : 20, color: data?.risk_level === 'High' ? "bg-red-500" : "bg-success" },
+                                { label: "Regulatory Quality", level: data?.estimated_complexity * 10 || 35, color: data?.estimated_complexity > 7 ? "bg-red-500" : "bg-success" },
                                 { label: "Customs Efficiency", level: 60, color: "bg-warning" },
                             ].map(item => (
                                 <div key={item.label} className="space-y-2">

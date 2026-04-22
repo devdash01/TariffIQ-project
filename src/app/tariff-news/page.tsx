@@ -3,6 +3,7 @@ import React from "react";
 import PageShell from "@/components/PageShell";
 import { Sparkles, Calendar, Globe, Hash, CheckCircle2, ChevronDown, Filter, Newspaper, CalendarDays, ArrowRight, X, Check, Activity, ShieldAlert, BarChart3, RefreshCw } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
+import { useTradeContext } from "@/context/TradeContext";
 
 /* ── Data ───────────────────────────────────────── */
 const NEWS_ITEMS = [
@@ -160,13 +161,23 @@ const getTagStyle = (type: string) => {
 
 /* ── Component ──────────────────────────────────── */
 export default function TariffNews() {
+    const { hsCode, origin, dest, weight, value, transport } = useTradeContext();
     const [newsData, setNewsData] = React.useState<any[]>(NEWS_ITEMS);
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
         const fetchNews = async () => {
             try {
-                const res = await fetch("http://127.0.0.1:8000/api/news");
+                // If we have an active trade, send it to the policy shock engine for personal impact
+                let url = "/api/news";
+                let options: any = { method: "GET" };
+
+                if (hsCode) {
+                    // Note: We'd need a POST endpoint or query params for personalized news
+                    // For now, the news endpoint is GET, but we can enhance it
+                }
+
+                const res = await fetch(url, options);
                 if (res.ok) {
                     const data = await res.json();
                     if (data.news && data.news.length > 0) {
@@ -174,6 +185,9 @@ export default function TariffNews() {
                         const mappedNews = data.news.map((n: any, i: number) => {
                             const p = n.analysis?.extracted_policy || {};
                             const s = n.analysis?.strategic_analysis || {};
+
+                            // Check if this news affects our active HS code
+                            const isAffected = hsCode && p.likely_affected_hs_chapters?.some((ch: string) => hsCode.startsWith(ch.split(" ")[0]));
 
                             // Determine impact type based on risk score or tariff direction
                             let impactType = "neutral";
@@ -188,6 +202,10 @@ export default function TariffNews() {
                             } else {
                                 impactType = "mixed";
                                 tags.push({ label: "Mixed Impact", type: "mixed" });
+                            }
+
+                            if (isAffected) {
+                                tags.unshift({ label: "Affects You", type: "high" });
                             }
 
                             tags.push({ label: p.policy_type || "Trade Policy", type: "neutral" });
@@ -215,7 +233,8 @@ export default function TariffNews() {
                                 source: n.article.source || "The News API",
                                 impactType: impactType,
                                 impactWarning: s.recommended_actions ? s.recommended_actions[0] : "Review exposure.",
-                                fullUrl: n.article.url
+                                fullUrl: n.article.url,
+                                isAffected: isAffected
                             };
                         });
                         setNewsData(mappedNews);
@@ -229,7 +248,7 @@ export default function TariffNews() {
         };
 
         fetchNews();
-    }, []);
+    }, [hsCode]);
 
     return (
         <PageShell title="Tariff News">

@@ -11,20 +11,43 @@ const suggestions = [
 ];
 
 export default function HSCode() {
-    const { name } = useTradeContext();
+    const { name, description, setTradeData } = useTradeContext();
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [hasResults, setHasResults] = useState(false);
     const [selectedCode, setSelectedCode] = useState<string | null>(null);
+    const [apiResults, setApiResults] = useState<any[]>([]);
+
+    const displayResults = apiResults.length > 0 ? apiResults : suggestions;
 
     useEffect(() => {
-        if (name && !hasResults) {
+        if ((description || name) && !hasResults && !isAnalyzing) {
             setIsAnalyzing(true);
-            setTimeout(() => {
-                setIsAnalyzing(false);
-                setHasResults(true);
-            }, 2000);
+            
+            const performClassification = async () => {
+                try {
+                    const res = await fetch("/api/classify", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ product_description: description || name })
+                    });
+                    
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.results) {
+                            setApiResults(data.results);
+                        }
+                    }
+                } catch (err) {
+                    console.error("Classification failed:", err);
+                } finally {
+                    setIsAnalyzing(false);
+                    setHasResults(true);
+                }
+            };
+            
+            performClassification();
         }
-    }, [name, hasResults]);
+    }, [name, description, hasResults, isAnalyzing]);
 
     return (
         <PageShell title="HS Code AI Classification">
@@ -78,7 +101,7 @@ export default function HSCode() {
                         <Sparkles size={24} className="absolute inset-0 m-auto text-primary animate-pulse" />
                     </div>
                     <h2 className="text-2xl font-black text-foreground tracking-tight mb-2">Analyzing Product Data</h2>
-                    <p className="text-muted-foreground font-medium animate-pulse">Running MegaLLM classification models...</p>
+                    <p className="text-muted-foreground font-medium animate-pulse">Scanning global trade databases and applying GIR rules...</p>
                 </div>
             ) : (
                 /* Results State */
@@ -87,46 +110,49 @@ export default function HSCode() {
                     <div className="lg:col-span-2 space-y-6">
                         <div className="flex items-center justify-between px-2">
                             <h2 className="text-xl font-black text-foreground tracking-tight flex items-center gap-3">
-                                Candidate Classifications <span className="px-3 py-1 bg-primary/10 rounded-full text-xs text-primary font-black uppercase tracking-widest">{suggestions.length} Found</span>
+                                Candidate Classifications <span className="px-3 py-1 bg-primary/10 rounded-full text-xs text-primary font-black uppercase tracking-widest">{displayResults.length} Found</span>
                             </h2>
                         </div>
 
                         <div className="space-y-4">
-                            {suggestions.map((s) => (
+                            {displayResults.map((s) => (
                                 <div 
-                                    key={s.code} 
-                                    onClick={() => setSelectedCode(s.code)}
+                                    key={s.hs_code || s.code} 
+                                    onClick={() => {
+                                        setSelectedCode(s.hs_code || s.code);
+                                        setTradeData({ hsCode: s.hs_code || s.code });
+                                    }}
                                     className={`glass-card p-8 border cursor-pointer transition-all duration-300 relative group overflow-hidden ${
-                                        selectedCode === s.code ? 'border-primary ring-4 ring-primary/5 bg-primary/[0.02]' : 'border-border hover:border-primary/40'
+                                        selectedCode === (s.hs_code || s.code) ? 'border-primary ring-4 ring-primary/5 bg-primary/[0.02]' : 'border-border hover:border-primary/40'
                                     }`}
                                 >
-                                    {selectedCode === s.code && <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />}
+                                    {selectedCode === (s.hs_code || s.code) && <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />}
                                     
                                     <div className="flex items-start justify-between gap-6">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-3">
-                                                <div className="text-3xl font-black text-foreground tracking-tighter">{s.code}</div>
+                                                <div className="text-3xl font-black text-foreground tracking-tighter">{s.hs_code || s.code}</div>
                                                 <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 ${
-                                                    s.confidence > 90 ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+                                                    (s.score * 100 || s.confidence) > 90 ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
                                                 }`}>
-                                                    <Zap size={10} fill="currentColor" /> {s.confidence}% Confidence
+                                                    <Zap size={10} fill="currentColor" /> {Math.round(s.score * 100) || s.confidence}% Confidence
                                                 </div>
                                             </div>
-                                            <h3 className="text-lg font-bold text-foreground mb-3">{s.title}</h3>
+                                            <h3 className="text-lg font-bold text-foreground mb-3">{s.description || s.title}</h3>
                                             <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
-                                                <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                    <CheckCircle size={10} /> AI Reasoning
+                                                <div className="text-[10px] font-black text-primary uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                    <ShieldCheck size={10} /> Classification Defense
                                                 </div>
                                                 <p className="text-sm text-muted-foreground font-medium leading-relaxed italic">&quot;{s.reasoning}&quot;</p>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end gap-2 shrink-0">
                                             <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Base Duty</div>
-                                            <div className="text-2xl font-black text-primary tracking-tight">{s.duty}</div>
+                                            <div className="text-2xl font-black text-primary tracking-tight">{s.duty_rate || s.duty}</div>
                                             <button className={`mt-4 px-6 py-2 rounded-xl font-black text-xs transition-all ${
-                                                selectedCode === s.code ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-muted text-muted-foreground'
+                                                selectedCode === (s.hs_code || s.code) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-muted text-muted-foreground'
                                             }`}>
-                                                {selectedCode === s.code ? 'Selected' : 'Select Code'}
+                                                {selectedCode === (s.hs_code || s.code) ? 'Selected' : 'Select Code'}
                                             </button>
                                         </div>
                                     </div>

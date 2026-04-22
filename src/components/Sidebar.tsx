@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTradeContext } from "@/context/TradeContext";
 import {
     LayoutGrid, Globe, Sparkles, ShieldCheck,
     Calculator, TrendingUp, Newspaper, ChevronRight, Activity
@@ -58,6 +59,9 @@ export default function Sidebar() {
                         </Link>
                     );
                 })}
+
+                {/* Live Cost Widget */}
+                <LiveCostWidget />
             </nav>
 
             {/* User footer */}
@@ -75,5 +79,50 @@ export default function Sidebar() {
                 </div>
             </div>
         </aside>
+    );
+}
+
+function LiveCostWidget() {
+    const { hsCode, landedCost, name } = useTradeContext();
+    
+    if (!name) return null;
+
+    return (
+        <div className="mt-8 mx-2 p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 border border-white/5 shadow-2xl relative overflow-hidden animate-fade-in-up">
+            <div className="absolute top-0 right-0 p-2">
+                <Activity size={12} className="text-success animate-pulse" />
+            </div>
+            
+            <div className="relative z-10">
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Live Trade Preview</div>
+                
+                <div className="space-y-4">
+                    <div>
+                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-tight mb-1">Detected HS Code</div>
+                        <div className="text-xs font-black text-white flex items-center gap-1.5">
+                            <Sparkles size={10} className="text-primary" />
+                            {hsCode || "Classifying..."}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-tight mb-1">Est. Landed Cost</div>
+                        <div className="text-lg font-black text-success">
+                            {landedCost?.total_landed_cost 
+                                ? `$${Math.round(landedCost.total_landed_cost).toLocaleString()}` 
+                                : "Calculating..."}
+                        </div>
+                    </div>
+                </div>
+
+                <Link href="/landed-cost" className="mt-4 flex items-center justify-between text-[10px] font-bold text-white/50 hover:text-white transition-colors group">
+                    View Full Analysis
+                    <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+            </div>
+
+            {/* Decor */}
+            <div className="absolute -bottom-6 -right-6 w-16 h-16 bg-primary/10 rounded-full blur-xl" />
+        </div>
     );
 }

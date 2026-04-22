@@ -121,6 +121,41 @@ export default function Optimize() {
     const bestScenario = sortedScenarios.find(s => s.route !== d.route) || sortedScenarios[0] || d;
     const bestSrc = bestScenario.route.split(" → ")[0].trim().replace(/\b\w/g, (l: string) => l.toUpperCase());
 
+    const [adviceLoading, setAdviceLoading] = useState(false);
+    const [dynamicStrategies, setDynamicStrategies] = useState<any[]>([]);
+    const [dynamicAdvisor, setDynamicAdvisor] = useState<any>(null);
+
+    // Fetch dynamic advice
+    useEffect(() => {
+        if (!ctxOrigin || !ctxDest || !ctxDescription) return;
+
+        const fetchAdvice = async () => {
+            setAdviceLoading(true);
+            try {
+                const res = await fetch("/api/optimization-advice", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        product_description: ctxDescription,
+                        origin: ctxOrigin,
+                        destination: ctxDest
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setDynamicStrategies(data.strategies || []);
+                    setDynamicAdvisor(data.advisor || null);
+                }
+            } catch (err) {
+                console.error("Failed to fetch advice", err);
+            } finally {
+                setAdviceLoading(false);
+            }
+        };
+
+        fetchAdvice();
+    }, [ctxOrigin, ctxDest, ctxDescription]);
+
     // Set the best source for vendor fetching if different
     useEffect(() => {
         if (bestSrc && bestSrc !== bestSrcParam) {
@@ -375,7 +410,7 @@ export default function Optimize() {
                             </div>
 
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                                {[
+                                {(dynamicStrategies.length > 0 ? dynamicStrategies : [
                                     {
                                         title: "Duty Exposure Reduction",
                                         impact: "High Impact",
@@ -391,24 +426,8 @@ export default function Optimize() {
                                         effort: "Low",
                                         time: "1-2 months",
                                         save: `${fmt(savings)} per shipment`,
-                                    },
-                                    {
-                                        title: "Alternative Routing",
-                                        impact: "Medium Impact",
-                                        desc: "Transshipment through Singapore port to reduce handling costs",
-                                        effort: "Low",
-                                        time: "Immediate",
-                                        save: `${fmt(savings * 0.12)} per shipment`,
-                                    },
-                                    {
-                                        title: "Consolidation",
-                                        impact: "Medium Impact",
-                                        desc: "Combine multiple smaller shipments into bulk orders",
-                                        effort: "Medium",
-                                        time: "2-3 months",
-                                        save: `${fmt(savings * 0.35)} per shipment`,
-                                    },
-                                ].map(s => (
+                                    }
+                                ]).map(s => (
                                     <div key={s.title} style={{ padding: "20px", borderRadius: 12, border: "1px solid var(--border)", background: "#fff" }}>
                                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                                             <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text-primary)" }}>{s.title}</div>
@@ -449,23 +468,23 @@ export default function Optimize() {
                                     <Sparkles size={18} color="#fff" />
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <h4 style={{ fontSize: 18, fontWeight: 800, color: "#312e81", marginBottom: 6 }}>Import now with partial stockpiling</h4>
-                                    <p style={{ fontSize: 14, color: "#4f46e5", fontWeight: 500, marginBottom: 16 }}>Tariff increase expected in Q2 2026. Current rates favorable.</p>
+                                    <h4 style={{ fontSize: 18, fontWeight: 800, color: "#312e81", marginBottom: 6 }}>{dynamicAdvisor?.headline || "Strategic Recommendation Pending"}</h4>
+                                    <p style={{ fontSize: 14, color: "#4f46e5", fontWeight: 500, marginBottom: 16 }}>{dynamicAdvisor?.summary || "Analyzing current trade climate..."}</p>
 
                                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
                                         <div style={{ padding: "12px 16px", borderRadius: 8, border: "1px solid #e5e7eb" }}>
-                                            <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between" }}><span>Confidence Score</span> <span style={{ color: "#4f46e5" }}>87%</span></div>
+                                            <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between" }}><span>Confidence Score</span> <span style={{ color: "#4f46e5" }}>{dynamicAdvisor?.confidence || 0}%</span></div>
                                             <div style={{ height: 6, background: "#e2e8f0", borderRadius: 99, width: "100%" }}>
-                                                <div style={{ height: "100%", width: "87%", background: "#4f46e5", borderRadius: 99 }} />
+                                                <div style={{ height: "100%", width: `${dynamicAdvisor?.confidence || 0}%`, background: "#4f46e5", borderRadius: 99 }} />
                                             </div>
                                         </div>
                                         <div style={{ padding: "12px 16px", borderRadius: 8, border: "1px solid #e5e7eb" }}>
                                             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 2 }}>Action Window</div>
-                                            <div style={{ fontSize: 15, fontWeight: 800, color: "#4f46e5" }}>Next 60 days</div>
+                                            <div style={{ fontSize: 15, fontWeight: 800, color: "#4f46e5" }}>{dynamicAdvisor?.window || "TBD"}</div>
                                         </div>
                                         <div style={{ padding: "12px 16px", borderRadius: 8, border: "1px solid #e5e7eb" }}>
                                             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 2 }}>Trade Outlook</div>
-                                            <div style={{ fontSize: 15, fontWeight: 800, color: "#059669" }}>Bullish</div>
+                                            <div style={{ fontSize: 15, fontWeight: 800, color: "#059669" }}>{dynamicAdvisor?.outlook || "Neutral"}</div>
                                         </div>
                                     </div>
                                 </div>

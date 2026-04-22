@@ -157,7 +157,8 @@ Return VALID JSON only in this exact format:
       "category": "Certifications & Standards | Labelling & Packaging | Customs Documentation | Taxes & Duties | Prohibitions & Restrictions",
       "requirement_title": "Short title of the requirement",
       "description": "Actionable description of what needs to be done",
-      "is_mandatory": true/false
+      "is_mandatory": true/false,
+      "ai_suggestion": "Practical advice on how to obtain this license or meet this standard (e.g., 'Apply via the DGFT portal' or 'Contact a certified testing lab')"
     }}
   ],
   "estimated_complexity": "1-10",

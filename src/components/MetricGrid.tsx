@@ -1,61 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { TrendingDown, DollarSign, AlertTriangle, Zap } from "lucide-react";
-
-const metrics = [
-    {
-        label: "Potential Savings",
-        value: 5240,
-        display: (n: number) => `$${n.toLocaleString()}`,
-        sub: "vs. current route",
-        trend: "+12.4%",
-        positive: true,
-        icon: TrendingDown,
-        color: "text-success",
-        bgColor: "bg-success/10",
-        borderColor: "border-success/20",
-        accentColor: "border-t-success",
-    },
-    {
-        label: "Total Landed Cost",
-        value: 14000,
-        display: (n: number) => `$${n.toLocaleString()}`,
-        sub: "optimized estimate",
-        trend: "-8.2%",
-        positive: true,
-        icon: DollarSign,
-        color: "text-blue-500",
-        bgColor: "bg-blue-500/10",
-        borderColor: "border-blue-500/20",
-        accentColor: "border-t-blue-500",
-    },
-    {
-        label: "Compliance Risk",
-        value: null,
-        display: () => "Low",
-        sub: "2 items need review",
-        trend: "2 alerts",
-        positive: false,
-        icon: AlertTriangle,
-        color: "text-warning",
-        bgColor: "bg-warning/10",
-        borderColor: "border-warning/20",
-        accentColor: "border-t-warning",
-    },
-    {
-        label: "Active Alerts",
-        value: 7,
-        display: (n: number) => `${n}`,
-        sub: "3 flagged high priority",
-        trend: "-2 today",
-        positive: true,
-        icon: Zap,
-        color: "text-purple-500",
-        bgColor: "bg-purple-500/10",
-        borderColor: "border-purple-500/20",
-        accentColor: "border-t-purple-500",
-    },
-];
+import { useTradeContext } from "@/context/TradeContext";
 
 function useCountUp(target: number | null, delay = 0) {
     const [count, setCount] = useState(0);
@@ -76,7 +22,7 @@ function useCountUp(target: number | null, delay = 0) {
     return count;
 }
 
-function Card({ m, delay }: { m: typeof metrics[0]; delay: number }) {
+function Card({ m, delay }: { m: any; delay: number }) {
     const count = useCountUp(m.value, delay);
 
     return (
@@ -105,9 +51,76 @@ function Card({ m, delay }: { m: typeof metrics[0]; delay: number }) {
 }
 
 export function MetricGrid() {
+    const { landedCost, scenarios, hsCode } = useTradeContext();
+    
+    // Calculate real values from context
+    const currentCost = landedCost?.total_landed_cost || 0;
+    const bestScenario = scenarios && scenarios.length > 0 
+        ? [...scenarios].sort((a, b) => a.total_landed_cost - b.total_landed_cost)[0]
+        : null;
+    
+    const savings = bestScenario && currentCost > 0 
+        ? Math.max(0, currentCost - bestScenario.total_landed_cost)
+        : 0;
+
+    const metrics = [
+        {
+            label: "Potential Savings",
+            value: savings > 0 ? savings : 5240,
+            display: (n: number) => `$${n.toLocaleString()}`,
+            sub: savings > 0 ? `via ${bestScenario?.route.split(" -> ")[0]}` : "vs. current route",
+            trend: savings > 0 ? `-${Math.round((savings / currentCost) * 100)}%` : "+12.4%",
+            positive: true,
+            icon: TrendingDown,
+            color: "text-success",
+            bgColor: "bg-success/10",
+            borderColor: "border-success/20",
+            accentColor: "border-t-success",
+        },
+        {
+            label: "Total Landed Cost",
+            value: currentCost > 0 ? currentCost : 14000,
+            display: (n: number) => `$${n.toLocaleString()}`,
+            sub: currentCost > 0 ? "current shipment" : "optimized estimate",
+            trend: currentCost > 0 ? "Calculated" : "-8.2%",
+            positive: true,
+            icon: DollarSign,
+            color: "text-blue-500",
+            bgColor: "bg-blue-500/10",
+            borderColor: "border-blue-500/20",
+            accentColor: "border-t-blue-500",
+        },
+        {
+            label: "Compliance Risk",
+            value: null,
+            display: () => hsCode ? "Low" : "Pending",
+            sub: hsCode ? "Classification active" : "Input required",
+            trend: hsCode ? "Clear" : "Alert",
+            positive: !!hsCode,
+            icon: AlertTriangle,
+            color: hsCode ? "text-success" : "text-warning",
+            bgColor: hsCode ? "bg-success/10" : "bg-warning/10",
+            borderColor: hsCode ? "border-success/20" : "border-warning/20",
+            accentColor: hsCode ? "border-t-success" : "border-t-warning",
+        },
+        {
+            label: "Product HS Code",
+            value: null,
+            display: () => hsCode || "Not Set",
+            sub: hsCode ? "Verified AI match" : "Run classification",
+            trend: hsCode ? "Verified" : "Missing",
+            positive: !!hsCode,
+            icon: Zap,
+            color: "text-purple-500",
+            bgColor: "bg-purple-500/10",
+            borderColor: "border-purple-500/20",
+            accentColor: "border-t-purple-500",
+        },
+    ];
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {metrics.map((m, i) => <Card key={m.label} m={m} delay={i * 100} />)}
+            {metrics.map((m, i) => <Card key={m.label} m={m as any} delay={i * 100} />)}
         </div>
     );
 }
