@@ -110,6 +110,4 @@ export function MetricGrid() {
             {metrics.map((m, i) => <Card key={m.label} m={m} delay={i * 100} />)}
         </div>
     );
-}
-;
-}
+}
