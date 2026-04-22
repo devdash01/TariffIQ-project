@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: tariffiq-api
+    env: python
+    region: singapore # Closest to India for better performance
+    plan: free
+    numInstances: 1
+    buildCommand: "pip install -r model/requirements.txt"
+    startCommand: "uvicorn run_backend:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: GROQ_API_KEY
+        value: "DEMO_MODE"
+      - key: TAVILY_API_KEY
+        value: "DEMO_MODE"
+      - key: NEWS_API_KEY
+        value: "DEMO_MODE"
+      - key: TOKENIZERS_PARALLELISM
+        value: false

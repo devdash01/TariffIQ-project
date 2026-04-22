@@ -1,0 +1,33 @@
+{
+  "name": "tariffiq",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.8.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"next dev\" \"python run_backend.py\"",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "backend": "python run_backend.py"
+  },
+  "dependencies": {
+    "next": "^15.1.4",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "tailwindcss": "4.0.0",
+    "@tailwindcss/postcss": "4.0.0",
+    "lucide-react": "^0.575.0",
+    "recharts": "^2.13.3",
+    "concurrently": "^8.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^15.1.4",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,14 @@
+# Ignore Python Backend from Vercel auto-detection
+model/
+data/
+data_manipulation/
+scripts/
+run_backend.py
+requirements.txt
+runtime.txt
+.env
+.DS_Store
+node_modules/
+.next/
+out/
+build/
