@@ -1,6 +1,5 @@
 # TariffIQ: Global Trade Intelligence Platform
 
-*Production Build: 2026-04-03T12:48:00Z*
 
 TariffIQ is an AI-powered optimization engine designed to automate HS-code classification, landed cost calculations, and regulatory compliance for global trade.
 
@@ -39,8 +38,4 @@ TariffIQ is an AI-powered optimization engine designed to automate HS-code class
    python server_entry.py
    ```
 
-## Author
-Dakshh Goel
 
-## License
-Proprietary. Developed for Trade-Tech Hackathon 2026.
