@@ -25,8 +25,8 @@ export default function Sidebar() {
             {/* Logo */}
             <div className="p-6 border-b border-border">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
-                        <Activity size={22} className="text-primary-foreground" strokeWidth={2.5} />
+                    <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                        <img src="/logo.png" alt="TariffIQ Logo" className="w-full h-full object-contain" />
                     </div>
                     <div>
                         <div className="font-extrabold text-xl tracking-tight text-foreground leading-none">

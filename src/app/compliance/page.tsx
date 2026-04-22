@@ -139,71 +139,43 @@ export default function Compliance() {
                 ))}
             </div>
 
-            {/* Rules Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                {/* Left: Rules Checklist */}
-                <div className="lg:col-span-2 space-y-6 animate-fade-in-up delay-200">
-                    <div className="flex items-center justify-between px-2">
-                        <h2 className="text-xl font-black text-foreground tracking-tight flex items-center gap-3">
-                            Regulatory Checklist <span className="px-3 py-1 bg-muted rounded-full text-xs text-muted-foreground">{checklist.length} Rules</span>
-                        </h2>
-                        <div className="flex items-center gap-2">
-                            {loading && <RefreshCw size={16} className="animate-spin text-primary" />}
-                            <div className="relative group">
-                                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                <input placeholder="Filter rules..." className="pl-9 pr-4 py-2 rounded-xl bg-muted/50 border border-border text-xs outline-none focus:border-primary" />
-                            </div>
+            {/* Required Certifications & Licenses */}
+            <div className="mb-12 animate-fade-in-up delay-150">
+                <h2 className="text-xl font-black text-foreground tracking-tight flex items-center gap-3 mb-6 px-2">
+                    <FileText size={22} className="text-primary" /> Required Licenses & Certificates
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                    {checklist.filter((r: any) => r.category?.includes("Certif") || r.category?.includes("License") || r.is_mandatory).map((cert: any, i: number) => (
+                        <div key={i} className="px-5 py-3 rounded-2xl bg-primary/5 border border-primary/20 flex items-center gap-3 hover:bg-primary/10 transition-colors">
+                            <CheckCircle2 size={16} className="text-primary" />
+                            <span className="text-sm font-bold text-foreground">{cert.requirement_title || cert.title}</span>
                         </div>
-                    </div>
+                    ))}
+                    {checklist.length === 0 && !loading && (
+                        <div className="text-sm text-muted-foreground italic px-2">No specific licenses identified for this trade route.</div>
+                    )}
+                </div>
+            </div>
 
-                    <div className="space-y-4">
-                        {checklist.map((rule: any, i: number) => (
-                            <ChecklistItem key={i} rule={rule} />
-                        ))}
+            {/* Rules Section */}
+            <div className="space-y-6 animate-fade-in-up delay-200">
+                <div className="flex items-center justify-between px-2">
+                    <h2 className="text-xl font-black text-foreground tracking-tight flex items-center gap-3">
+                        Regulatory Checklist <span className="px-3 py-1 bg-muted rounded-full text-xs text-muted-foreground">{checklist.length} Rules</span>
+                    </h2>
+                    <div className="flex items-center gap-2">
+                        {loading && <RefreshCw size={16} className="animate-spin text-primary" />}
+                        <div className="relative group">
+                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                            <input placeholder="Filter rules..." className="pl-9 pr-4 py-2 rounded-xl bg-muted/50 border border-border text-xs outline-none focus:border-primary" />
+                        </div>
                     </div>
                 </div>
 
-                {/* Right: Risk Heatmap / Info */}
-                <div className="space-y-6 animate-fade-in-up delay-300">
-                    <div className="glass-card p-8 bg-card border border-border shadow-sm rounded-[2rem]">
-                        <h3 className="text-lg font-black text-foreground tracking-tight mb-6">Regional Risk Heatmap</h3>
-                        <div className="aspect-square bg-muted/30 rounded-2xl border border-border relative overflow-hidden group cursor-crosshair">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <Globe2 size={64} className="text-muted-foreground/20 group-hover:scale-110 transition-transform duration-700" />
-                            </div>
-                            <div className="absolute top-4 left-4 p-3 bg-white/80 backdrop-blur border border-border rounded-xl shadow-sm">
-                                <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Selected Region</div>
-                                <div className="text-sm font-bold text-foreground">{dest || "Vietnam (VN)"}</div>
-                                <div className="flex items-center gap-1 mt-1">
-                                    <div className={`w-2 h-2 rounded-full ${data?.risk_level === 'High' ? 'bg-red-500' : 'bg-success'}`} />
-                                    <span className={`text-[10px] font-bold uppercase ${data?.risk_level === 'High' ? 'text-red-500' : 'text-success'}`}>
-                                        {data?.risk_level || "Low"} Risk
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-6 space-y-4">
-                            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-muted-foreground px-1">
-                                <span>Risk Factors</span>
-                                <span>Level</span>
-                            </div>
-                            {[
-                                { label: "Political Stability", level: data?.risk_level === 'High' ? 65 : 20, color: data?.risk_level === 'High' ? "bg-red-500" : "bg-success" },
-                                { label: "Regulatory Quality", level: data?.estimated_complexity * 10 || 35, color: data?.estimated_complexity > 7 ? "bg-red-500" : "bg-success" },
-                                { label: "Customs Efficiency", level: 60, color: "bg-warning" },
-                            ].map(item => (
-                                <div key={item.label} className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm font-bold text-foreground">{item.label}</span>
-                                        <span className="text-xs font-black text-muted-foreground">{item.level}%</span>
-                                    </div>
-                                    <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                                        <div className={`h-full ${item.color}`} style={{ width: `${item.level}%` }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {checklist.map((rule: any, i: number) => (
+                        <ChecklistItem key={i} rule={rule} />
+                    ))}
                 </div>
             </div>
         </PageShell>

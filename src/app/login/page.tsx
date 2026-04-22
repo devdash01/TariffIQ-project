@@ -29,8 +29,8 @@ export default function LoginPage() {
 
             {/* Logo */}
             <Link href="/" className="absolute top-8 left-8 flex items-center gap-3 z-10 transition-opacity hover:opacity-80">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <Activity size={18} className="text-white" strokeWidth={2.5} />
+                <div className="w-10 h-10 flex items-center justify-center">
+                    <img src="/logo.png" alt="TariffIQ Logo" className="w-full h-full object-contain" />
                 </div>
                 <div className="font-extrabold text-xl tracking-tight text-white">TariffIQ</div>
             </Link>

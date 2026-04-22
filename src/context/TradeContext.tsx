@@ -80,12 +80,9 @@ export function TradeProvider({ children }: { children: ReactNode }) {
 
     // Prevent hydration mismatch by not rendering or rendering default until mounted
     // However, rendering children is fine, it just might flash default values
-    if (!mounted) {
-        return <TradeContext.Provider value={{ ...defaultState, setTradeData, clearTradeData }}>{children}</TradeContext.Provider>;
-    }
-
     // Automatic Pipeline: Triggers HS detection and Landed Cost when data is sufficient
     useEffect(() => {
+        if (!mounted) return;
         const { origin, dest, value, qty, weight, name, description, hsCode, transport } = state;
         
         // Requirements for calculation

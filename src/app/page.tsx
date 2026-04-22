@@ -109,12 +109,10 @@ export default function LandingPage() {
                 <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         <div style={{
-                            width: 36, height: 36, borderRadius: 10,
-                            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            boxShadow: '0 0 20px rgba(59,130,246,0.5)'
+                            width: 40, height: 40,
+                            display: "flex", alignItems: "center", justifyContent: "center"
                         }}>
-                            <Activity size={20} color="#fff" strokeWidth={2.5} />
+                            <img src="/logo.png" alt="TariffIQ Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                         </div>
                         <div style={{ fontWeight: 800, fontSize: 20, color: "#fff", letterSpacing: '-0.02em' }}>TariffIQ</div>
                     </div>
